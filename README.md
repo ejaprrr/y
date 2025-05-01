@@ -1,3 +1,3 @@
-# y
+# Y
 
-X (former Twitter) ale je to Y
+X (dříve Twitter), ale je to Y
