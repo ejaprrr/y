@@ -1,6 +1,6 @@
 <?php
 
-include_once "../config/database.php";
+include_once __DIR__ . '/../config/database.php';
 
 $conn = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 

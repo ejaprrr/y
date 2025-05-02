@@ -1,6 +1,6 @@
 <?php
-require_once "../resources/connection.php";
-require_once "../resources/functions.php";
+require_once __DIR__ . '/../../resources/connection.php';
+require_once __DIR__ . '/../../resources/functions.php';
 start_session();
 
 $message = "";
@@ -13,7 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $user = find_user($conn, $user_name);
         if ($user && password_verify($password, $user['password'])) {
             $_SESSION["user_name"] = $user['user_name'];
-            redirect("feed.php");
+            redirect("../app/feed.php");
         } else {
             $message = "Invalid username or password";
         }

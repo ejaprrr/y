@@ -1,6 +1,6 @@
 <?php
-require_once "../resources/connection.php";
-require_once "../resources/functions.php";
+require_once __DIR__ . "/../../resources/connection.php";
+require_once __DIR__ . "/../../resources/functions.php";
 start_session();
 
 $message = "";

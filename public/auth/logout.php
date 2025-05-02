@@ -1,8 +1,9 @@
 <?php
-session_start();
+require_once __DIR__ . '/../../resources/functions.php';
 
-session_unset();
-session_destroy();
+// Use the abstracted function instead
+logout();
 
-header("Location: login.php");
+// Redirect to login page
+redirect("login.php");
 ?>
