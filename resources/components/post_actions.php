@@ -23,4 +23,12 @@
             <span class="small"><?php if ($post['reply_count'] > 0): ?><?php echo $post['reply_count']; ?><?php endif; ?></span>
         </button>
     </form>
+    
+    <form method="post" class="d-inline">
+        <input type="hidden" name="action" value="bookmark">
+        <input type="hidden" name="tweet_id" value="<?php echo $post['id']; ?>">
+        <button type="submit" class="btn btn-sm text-muted p-0 border-0" title="<?php echo $post['user_bookmarked'] ? 'Remove from bookmarks' : 'Add to bookmarks'; ?>">
+            <?php echo $post['user_bookmarked'] ? '<i class="bi bi-bookmark-fill text-primary"></i>' : '<i class="bi bi-bookmark"></i>'; ?>
+        </button>
+    </form>
 </div>

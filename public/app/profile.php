@@ -69,6 +69,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     redirect("profile.php?username=$profile_username&tab=$active_tab");
 }
 
+// Handle bookmark action
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'bookmark' && isset($_POST['tweet_id'])) {
+    $post_id = (int)$_POST['tweet_id'];
+    
+    if (has_bookmarked($conn, $user['user_name'], $post_id)) {
+        unbookmark_post($conn, $user['user_name'], $post_id);
+    } else {
+        bookmark_post($conn, $user['user_name'], $post_id);
+    }
+    
+    // Redirect to prevent form resubmission
+    redirect("profile.php?username=$profile_username&tab=$active_tab");
+}
+
 // Profile tabs configuration
 $tabs = [
     [

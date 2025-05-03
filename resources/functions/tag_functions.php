@@ -145,16 +145,23 @@ function get_top_hashtags($conn, $limit = 5) {
 }
 
 /**
- * Get posts for a specific hashtag
+ * Get posts with a specific hashtag
  *
  * @param mysqli $conn Database connection
- * @param string $hashtag Hashtag to search for (without # symbol)
- * @param string $current_user Current user viewing the posts
- * @param int $limit Maximum posts to return
- * @return array Posts containing the hashtag
+ * @param string $tag Hashtag to search for (without #)
+ * @param string $current_user Current viewing user
+ * @param string $sort Sort by top (engagement) or latest (date)
+ * @param int $limit Maximum results to return
+ * @return array Posts with hashtag
  */
-function get_hashtag_posts($conn, $hashtag, $current_user, $limit = 30) {
-    $search_term = "%#$hashtag%";
+function get_hashtag_posts($conn, $tag, $current_user, $sort = 'top', $limit = 30) {
+    $tag_pattern = '%#' . $conn->real_escape_string(strtolower($tag)) . '%';
+    
+    $order_by = $sort === 'top' 
+        ? "((SELECT COUNT(*) FROM likes WHERE post_id = p.id) + " .
+          "(SELECT COUNT(*) FROM reposts WHERE post_id = p.id) * 2 + " .
+          "(SELECT COUNT(*) FROM posts WHERE target_post_id = p.id)) DESC, p.created_at DESC" 
+        : "p.created_at DESC";
     
     $stmt = $conn->prepare("
         SELECT 
@@ -163,24 +170,23 @@ function get_hashtag_posts($conn, $hashtag, $current_user, $limit = 30) {
             u.display_name,
             u.profile_picture_url,
             NULL as reposted_by,
-            target_u.user_name as reply_to_username,
-            target_p.text_content as reply_to_content,
-            target_p.id as reply_to_id,
+            NULL as reply_to_username,
+            NULL as reply_to_content,
+            NULL as reply_to_id,
             (SELECT COUNT(*) FROM likes WHERE post_id = p.id) AS like_count,
             EXISTS(SELECT 1 FROM likes WHERE post_id = p.id AND user_name = ?) AS user_liked,
             (SELECT COUNT(*) FROM reposts WHERE post_id = p.id) AS repost_count,
             EXISTS(SELECT 1 FROM reposts WHERE post_id = p.id AND user_name = ?) AS user_reposted,
-            (SELECT COUNT(*) FROM posts WHERE target_post_id = p.id) AS reply_count
+            (SELECT COUNT(*) FROM posts WHERE target_post_id = p.id) AS reply_count,
+            EXISTS(SELECT 1 FROM bookmarks WHERE post_id = p.id AND user_name = ?) AS user_bookmarked
         FROM posts p
         JOIN users u ON p.author_user_name = u.user_name
-        LEFT JOIN posts target_p ON p.target_post_id = target_p.id
-        LEFT JOIN users target_u ON target_p.author_user_name = target_u.user_name
-        WHERE p.text_content LIKE ?
-        ORDER BY p.created_at DESC
+        WHERE LOWER(p.text_content) LIKE ?
+        ORDER BY $order_by
         LIMIT ?
     ");
     
-    $stmt->bind_param("sssi", $current_user, $current_user, $search_term, $limit);
+    $stmt->bind_param("ssssi", $current_user, $current_user, $current_user, $tag_pattern, $limit);
     $stmt->execute();
     $result = $stmt->get_result();
     

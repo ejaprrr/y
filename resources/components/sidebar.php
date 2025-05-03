@@ -28,6 +28,12 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
                     </a>
                 </li>
                 <li class="nav-item mb-2">
+                    <a href="/y/public/app/bookmarks.php" class="nav-link d-flex align-items-center p-2 text-dark text-decoration-none rounded-3 hover-bg-light <?php echo strpos($_SERVER['PHP_SELF'], 'bookmarks.php') !== false ? 'active fw-bold' : ''; ?>">
+                        <i class="bi bi-bookmark fs-5 me-3"></i>
+                        <span>Bookmarks</span>
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
                     <a href="/y/public/app/profile.php?username=<?php echo $user['user_name']; ?>" class="nav-link d-flex align-items-center p-2 text-dark text-decoration-none rounded-3 hover-bg-light <?php echo strpos($_SERVER['PHP_SELF'], 'profile.php') !== false && isset($_GET['username']) && $_GET['username'] === $user['user_name'] ? 'active fw-bold' : ''; ?>">
                         <i class="bi bi-person fs-5 me-3"></i>
                         <span>Profile</span>

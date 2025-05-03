@@ -16,4 +16,7 @@ require_once __DIR__ . '/functions/search_functions.php';
 
 // Tag functions (hashtags and mentions)
 require_once __DIR__ . '/functions/tag_functions.php';
+
+// Bookmark functions
+require_once __DIR__ . '/functions/bookmark_functions.php';
 ?>

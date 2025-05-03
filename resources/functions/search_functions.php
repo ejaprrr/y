@@ -13,11 +13,50 @@
  * @param int $limit Maximum results to return
  * @return array Posts matching the search criteria
  */
+/**
+ * Search posts
+ *
+ * @param mysqli $conn Database connection
+ * @param string $query Search query
+ * @param string $current_user Current viewing user
+ * @param string $sort Sort by top (engagement) or latest (date)
+ * @param int $limit Maximum results to return
+ * @return array Search results
+ */
 function search_posts($conn, $query, $current_user, $sort = 'top', $limit = 20) {
-    // Fuzzy search with LIKE operator
-    $search_term = "%$query%";
+    // Split query into words
+    $words = preg_split('/\s+/', trim($query));
+    $search_terms = [];
     
-    // Build the base SQL query
+    // Filter out words less than 2 chars
+    foreach ($words as $word) {
+        if (strlen($word) >= 2) {
+            $search_terms[] = '%' . $conn->real_escape_string($word) . '%';
+        }
+    }
+    
+    if (empty($search_terms)) {
+        return [];
+    }
+    
+    $search_conditions = [];
+    $param_types = '';
+    $params = [];
+    
+    foreach ($search_terms as $term) {
+        $search_conditions[] = "p.text_content LIKE ?";
+        $param_types .= 's';
+        $params[] = $term;
+    }
+    
+    $search_condition = implode(" OR ", $search_conditions);
+    
+    $order_by = $sort === 'top' 
+        ? "((SELECT COUNT(*) FROM likes WHERE post_id = p.id) + " .
+          "(SELECT COUNT(*) FROM reposts WHERE post_id = p.id) * 2 + " .
+          "(SELECT COUNT(*) FROM posts WHERE target_post_id = p.id)) DESC, p.created_at DESC" 
+        : "p.created_at DESC";
+    
     $sql = "
         SELECT 
             p.*, 
@@ -25,37 +64,29 @@ function search_posts($conn, $query, $current_user, $sort = 'top', $limit = 20) 
             u.display_name,
             u.profile_picture_url,
             NULL as reposted_by,
-            target_u.user_name as reply_to_username,
-            target_p.text_content as reply_to_content,
-            target_p.id as reply_to_id,
+            NULL as reply_to_username,
+            NULL as reply_to_content,
+            NULL as reply_to_id,
             (SELECT COUNT(*) FROM likes WHERE post_id = p.id) AS like_count,
             EXISTS(SELECT 1 FROM likes WHERE post_id = p.id AND user_name = ?) AS user_liked,
             (SELECT COUNT(*) FROM reposts WHERE post_id = p.id) AS repost_count,
             EXISTS(SELECT 1 FROM reposts WHERE post_id = p.id AND user_name = ?) AS user_reposted,
-            (SELECT COUNT(*) FROM posts WHERE target_post_id = p.id) AS reply_count
+            (SELECT COUNT(*) FROM posts WHERE target_post_id = p.id) AS reply_count,
+            EXISTS(SELECT 1 FROM bookmarks WHERE post_id = p.id AND user_name = ?) AS user_bookmarked
         FROM posts p
         JOIN users u ON p.author_user_name = u.user_name
-        LEFT JOIN posts target_p ON p.target_post_id = target_p.id
-        LEFT JOIN users target_u ON target_p.author_user_name = target_u.user_name
-        WHERE (
-            p.text_content LIKE ? OR
-            u.user_name LIKE ? OR
-            u.display_name LIKE ?
-        )
+        WHERE ($search_condition)
+        ORDER BY $order_by
+        LIMIT ?
     ";
     
-    // Add sorting
-    if ($sort === 'top') {
-        $sql .= " ORDER BY (like_count + repost_count + reply_count) DESC, p.created_at DESC";
-    } else { // latest
-        $sql .= " ORDER BY p.created_at DESC";
-    }
-    
-    // Add limit
-    $sql .= " LIMIT ?";
-    
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sssssi", $current_user, $current_user, $search_term, $search_term, $search_term, $limit);
+    
+    // Add current_user parameters and limit
+    $param_types .= 'sss' . 'i';
+    $params = array_merge([$current_user, $current_user, $current_user], $params, [$limit]);
+    
+    $stmt->bind_param($param_types, ...$params);
     $stmt->execute();
     $result = $stmt->get_result();
     
@@ -66,7 +97,6 @@ function search_posts($conn, $query, $current_user, $sort = 'top', $limit = 20) 
     
     return $posts;
 }
-
 /**
  * Search for users by username or display name
  *

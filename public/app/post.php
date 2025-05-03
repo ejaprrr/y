@@ -52,6 +52,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
+// Handle bookmark action
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'bookmark' && isset($_POST['tweet_id'])) {
+    $post_id = (int)$_POST['tweet_id'];
+    
+    if (has_bookmarked($conn, $user['user_name'], $post_id)) {
+        unbookmark_post($conn, $user['user_name'], $post_id);
+    } else {
+        bookmark_post($conn, $user['user_name'], $post_id);
+    }
+}
+
 // Get parent post if this is a reply
 $parent_post = null;
 if (isset($main_post['target_post_id']) && $main_post['target_post_id'] !== null) {

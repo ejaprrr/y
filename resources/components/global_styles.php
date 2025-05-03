@@ -81,4 +81,25 @@
     .stretched-link::after {
         z-index: 1;
     }
+    
+    /* Bookmark button animation */
+    .btn i.bi-bookmark,
+    .btn i.bi-bookmark-fill {
+        transition: all 0.2s ease;
+    }
+    
+    .btn:hover i.bi-bookmark {
+        transform: scale(1.2);
+        color: #0d6efd;
+    }
+    
+    .btn i.bi-bookmark-fill {
+        animation: bookmark-pulse 0.3s ease-in-out;
+    }
+    
+    @keyframes bookmark-pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.4); }
+        100% { transform: scale(1); }
+    }
 </style>

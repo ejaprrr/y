@@ -45,6 +45,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     redirect("hashtag.php?tag=".urlencode($tag));
 }
 
+// Handle bookmark action
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'bookmark' && isset($_POST['tweet_id'])) {
+    $post_id = (int)$_POST['tweet_id'];
+    
+    if (has_bookmarked($conn, $user['user_name'], $post_id)) {
+        unbookmark_post($conn, $user['user_name'], $post_id);
+    } else {
+        bookmark_post($conn, $user['user_name'], $post_id);
+    }
+    
+    // Redirect to prevent form resubmission
+    redirect("hashtag.php?tag=".urlencode($tag)."&tab=$active_tab");
+}
+
 // Get hashtag info
 $stmt = $conn->prepare("SELECT * FROM hashtags WHERE tag_name = ? LIMIT 1");
 $stmt->bind_param("s", $tag);

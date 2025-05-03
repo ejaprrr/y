@@ -10,9 +10,9 @@ start_session();
 $user = get_user_from_session($conn);
 
 // Handle active tab
-$active_tab = $_GET['tab'] ?? 'recommended';
-if (!in_array($active_tab, ['recommended', 'following'])) {
-    $active_tab = 'recommended';
+$active_tab = $_GET['tab'] ?? 'latest';
+if (!in_array($active_tab, ['latest', 'following'])) {
+    $active_tab = 'latest';
 }
 
 // Handle new post submission
@@ -45,11 +45,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
+// Handle bookmark action
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'bookmark' && isset($_POST['tweet_id'])) {
+    $post_id = (int)$_POST['tweet_id'];
+    
+    if (has_bookmarked($conn, $user['user_name'], $post_id)) {
+        unbookmark_post($conn, $user['user_name'], $post_id);
+    } else {
+        bookmark_post($conn, $user['user_name'], $post_id);
+    }
+}
+
 // Get posts based on active tab
 if ($active_tab === 'following') {
     $posts = get_feed_posts($conn, $user['user_name'], 30);
 } else {
-    $posts = get_recommended_posts($conn, $user['user_name'], 30);
+    $posts = get_latest_posts($conn, $user['user_name'], 30);
 }
 
 // Set up page variables
@@ -108,10 +119,10 @@ ob_start();
     <?php
     $tabs = [
         [
-            'id' => 'recommended',
-            'label' => 'Recommended',
-            'url' => "?tab=recommended",
-            'icon' => 'magic'
+            'id' => 'latest',
+            'label' => 'Latest',
+            'url' => "?tab=latest",
+            'icon' => 'clock'
         ],
         [
             'id' => 'following',
@@ -124,26 +135,13 @@ ob_start();
     include __DIR__ . '/../../resources/components/tabs_navigation.php';
     ?>
 
-    <!-- Feed content label -->
-    <div class="py-2 px-3 mb-3 bg-light rounded-3 d-flex align-items-center border">
-        <?php if ($active_tab === 'recommended'): ?>
-            <div class="text-primary fw-semibold">
-                <i class="bi bi-stars me-1"></i> Recommended for you
-            </div>
-        <?php else: ?>
-            <div class="text-primary fw-semibold">
-                <i class="bi bi-stars me-1"></i> Latest posts
-            </div>
-        <?php endif; ?>
-    </div>
-
     <!-- Posts -->
     <div class="posts-container">
         <?php if (empty($posts)): ?>
             <?php 
-                $icon = $active_tab === 'recommended' ? 'magic' : 'chat-square-text';
-                $title = $active_tab === 'recommended' ? 'No recommendations yet' : 'No posts yet';
-                $message = $active_tab === 'recommended' ? 'Like some posts to get personalized recommendations!' : 'Follow some users to see their posts in your feed!';
+                $icon = $active_tab === 'latest' ? 'clock' : 'chat-square-text';
+                $title = $active_tab === 'latest' ? 'No posts yet' : 'No posts yet';
+                $message = $active_tab === 'latest' ? 'Be the first to post something!' : 'Follow some users to see their posts in your feed!';
                 include __DIR__ . '/../../resources/components/empty_state.php'; 
             ?>
         <?php else: ?>
