@@ -10,4 +10,10 @@ require_once __DIR__ . '/functions/post_functions.php';
 
 // Authentication functions
 require_once __DIR__ . '/functions/auth_functions.php';
+
+// Search functions
+require_once __DIR__ . '/functions/search_functions.php';
+
+// Tag functions (hashtags and mentions)
+require_once __DIR__ . '/functions/tag_functions.php';
 ?>

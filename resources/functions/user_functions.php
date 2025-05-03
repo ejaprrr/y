@@ -165,4 +165,112 @@ function update_user_profile($conn, $user_name, $data) {
     $stmt->bind_param($types, ...$values);
     return $stmt->execute();
 }
+
+/**
+ * Get recommended users to follow
+ *
+ * @param mysqli $conn Database connection
+ * @param string $user_name Current user's username
+ * @param int $limit Maximum number of recommendations to return
+ * @return array Array of recommended users
+ */
+function get_recommended_users($conn, $user_name, $limit = 3) {
+    // First, get users with mutual connections that the user doesn't already follow
+    $mutual_query = "
+        SELECT u.*, 
+               COUNT(DISTINCT f_mutual.user_name) AS mutual_count,
+               0 AS is_following
+        FROM users u
+        JOIN follows f_others ON u.user_name = f_others.following_user_name
+        JOIN follows f_mutual ON f_others.user_name = f_mutual.following_user_name
+        WHERE f_mutual.user_name IN (
+            SELECT following_user_name 
+            FROM follows 
+            WHERE user_name = ?
+        )
+        AND u.user_name != ?
+        AND NOT EXISTS (
+            SELECT 1 
+            FROM follows 
+            WHERE user_name = ? 
+            AND following_user_name = u.user_name
+        )
+        GROUP BY u.user_name
+        ORDER BY mutual_count DESC, u.user_name
+        LIMIT ?
+    ";
+    
+    $stmt = $conn->prepare($mutual_query);
+    $stmt->bind_param("sssi", $user_name, $user_name, $user_name, $limit);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    $recommendations = [];
+    while ($row = $result->fetch_assoc()) {
+        // Add follower count
+        $follower_count = get_follower_count($conn, $row['user_name']);
+        $row['follower_count'] = $follower_count;
+        $recommendations[] = $row;
+    }
+    
+    // If we don't have enough recommendations with mutual connections, add popular users
+    if (count($recommendations) < $limit) {
+        $needed = $limit - count($recommendations);
+        $excluded_users = [$user_name]; // Start with excluding the current user
+        
+        // Exclude users we already recommended
+        foreach ($recommendations as $rec) {
+            $excluded_users[] = $rec['user_name'];
+        }
+        
+        $placeholders = str_repeat('?,', count($excluded_users) - 1) . '?';
+        
+        $popular_query = "
+            SELECT u.*, 
+                   (SELECT COUNT(*) FROM follows WHERE following_user_name = u.user_name) AS follower_count,
+                   0 AS is_following
+            FROM users u
+            WHERE u.user_name NOT IN ($placeholders)
+            AND NOT EXISTS (
+                SELECT 1 
+                FROM follows 
+                WHERE user_name = ? 
+                AND following_user_name = u.user_name
+            )
+            ORDER BY follower_count DESC, RAND()
+            LIMIT ?
+        ";
+        
+        // Create the parameter types string with an extra 's' for the user_name in NOT EXISTS
+        $types = str_repeat('s', count($excluded_users) + 1) . 'i';
+        // Add the user_name parameter for the NOT EXISTS clause
+        $params = array_merge($excluded_users, [$user_name, $needed]);
+        
+        $stmt = $conn->prepare($popular_query);
+        $stmt->bind_param($types, ...$params);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        while ($row = $result->fetch_assoc()) {
+            $recommendations[] = $row;
+        }
+    }
+    
+    return $recommendations;
+}
+
+/**
+ * Get follower count for a user
+ *
+ * @param mysqli $conn Database connection
+ * @param string $user_name Username to get follower count for
+ * @return int Number of followers
+ */
+function get_follower_count($conn, $user_name) {
+    $stmt = $conn->prepare("SELECT COUNT(*) AS count FROM follows WHERE following_user_name = ?");
+    $stmt->bind_param("s", $user_name);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_assoc()['count'] ?? 0;
+}
 ?>

@@ -69,6 +69,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     redirect("profile.php?username=$profile_username&tab=$active_tab");
 }
 
+// Profile tabs configuration
+$tabs = [
+    [
+        'id' => 'posts',
+        'label' => 'Posts',
+        'url' => "?username=$profile_username&tab=posts",
+        'icon' => 'file-text'
+    ],
+    [
+        'id' => 'replies',
+        'label' => 'Replies',
+        'url' => "?username=$profile_username&tab=replies",
+        'icon' => 'chat'
+    ]
+];
+
 // Set up page variables
 $page_title = 'Y | @' . htmlspecialchars($profile_username);
 $page_header = null; // We'll handle the header manually in the profile
@@ -137,43 +153,27 @@ ob_start();
         </div>
     </div>
     
-    <!-- Profile tabs -->
-    <div class="profile-tabs border-bottom mb-4">
-        <ul class="nav nav-tabs nav-fill border-0">
-            <li class="nav-item">
-                <a class="nav-link border-0 rounded-0 py-3 <?php echo $active_tab === 'posts' ? 'active fw-bold border-bottom border-primary border-3' : 'text-muted'; ?> hover-bg-light" 
-                   href="?username=<?php echo $profile_username; ?>&tab=posts">Posts</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link border-0 rounded-0 py-3 <?php echo $active_tab === 'replies' ? 'active fw-bold border-bottom border-primary border-3' : 'text-muted'; ?> hover-bg-light" 
-                   href="?username=<?php echo $profile_username; ?>&tab=replies">Replies</a>
-            </li>
-        </ul>
-    </div>
+    <!-- Profile tabs - Now using the shared component -->
+    <?php include __DIR__ . '/../../resources/components/tabs_navigation.php'; ?>
 
     <!-- Posts section -->
     <div class="posts-container">
         <?php if (empty($posts)): ?>
-            <div class="card border-0 shadow-sm rounded-4 p-5 text-center text-muted">
-                <div class="mb-4">
-                    <i class="bi bi-chat-square-text" style="font-size: 3rem;"></i>
-                </div>
-                <h5><?php echo $active_tab === 'posts' ? 'No posts yet' : 'No replies yet'; ?></h5>
-                <p class="text-muted">
-                    <?php if ($profile_username === $user['user_name']): ?>
-                        <?php echo $active_tab === 'posts' ? 'Your posts will appear here.' : 'Your replies will appear here.'; ?>
-                    <?php else: ?>
-                        <?php echo $active_tab === 'posts' ? 'This user hasn\'t posted yet.' : 'This user hasn\'t replied to any posts yet.'; ?>
-                    <?php endif; ?>
-                </p>
-            </div>
+            <?php 
+                $icon = 'chat-square-text';
+                $title = $active_tab === 'posts' ? 'No posts yet' : 'No replies yet';
+                
+                if ($profile_username === $user['user_name']) {
+                    $message = $active_tab === 'posts' ? 'Your posts will appear here.' : 'Your replies will appear here.';
+                } else {
+                    $message = $active_tab === 'posts' ? 'This user hasn\'t posted yet.' : 'This user hasn\'t replied to any posts yet.';
+                }
+                
+                include __DIR__ . '/../../resources/components/empty_state.php';
+            ?>
         <?php else: ?>
             <?php foreach ($posts as $post): ?>
-                <div class="card border-0 shadow-sm rounded-4 mb-3 hover-post">
-                    <div class="card-body p-0">
-                        <?php include __DIR__ . '/../../resources/components/post_item.php'; ?>
-                    </div>
-                </div>
+                <?php include __DIR__ . '/../../resources/components/post_card.php'; ?>
             <?php endforeach; ?>
         <?php endif; ?>
     </div>

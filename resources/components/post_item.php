@@ -16,17 +16,11 @@
     
     <div class="d-flex">
         <div class="me-3">
-            <div class="rounded-circle overflow-hidden" style="width: 48px; height: 48px; background-color: #f8f9fa;">
-                <?php if (!empty($post['profile_picture_url'])): ?>
-                    <img src="<?php echo htmlspecialchars($post['profile_picture_url']); ?>" 
-                         alt="<?php echo htmlspecialchars($post['username']); ?>" 
-                         class="img-fluid" style="width: 100%; height: 100%; object-fit: cover;">
-                <?php else: ?>
-                    <div class="d-flex justify-content-center align-items-center h-100">
-                        <i class="bi bi-person-circle text-secondary" style="font-size: 2rem;"></i>
-                    </div>
-                <?php endif; ?>
-            </div>
+            <?php 
+                $profile_picture_url = $post['profile_picture_url'];
+                $username = $post['username'];
+                include __DIR__ . '/user_avatar.php'; 
+            ?>
         </div>
         
         <div class="flex-grow-1">
@@ -65,9 +59,11 @@
             
             <p class="mb-2">
                 <a href="post.php?id=<?php echo $post['id']; ?>" class="text-decoration-none text-dark">
-                    <?php echo htmlspecialchars($post['content']); ?>
+                    <?php echo format_content_with_tags(htmlspecialchars($post['content'])); ?>
                 </a>
             </p>
+            
+            <!-- Remove media gallery include -->
             
             <?php include __DIR__ . '/post_actions.php'; ?>
         </div>

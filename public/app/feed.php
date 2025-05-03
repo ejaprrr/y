@@ -9,10 +9,16 @@ start_session();
 
 $user = get_user_from_session($conn);
 
-// Handle new post submission (only for original posts, not replies)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tweet_content'])) {
-    $content = trim($_POST['tweet_content']);
-    if (!empty($content)) {
+// Handle active tab
+$active_tab = $_GET['tab'] ?? 'recommended';
+if (!in_array($active_tab, ['recommended', 'following'])) {
+    $active_tab = 'recommended';
+}
+
+// Handle new post submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['tweet_content'])) {
+        $content = trim($_POST['tweet_content'] ?? '');
         create_post($conn, $user['user_name'], $content);
     }
 }
@@ -39,8 +45,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
-// Get feed posts
-$posts = get_feed_posts($conn, $user['user_name'], 30);
+// Get posts based on active tab
+if ($active_tab === 'following') {
+    $posts = get_feed_posts($conn, $user['user_name'], 30);
+} else {
+    $posts = get_recommended_posts($conn, $user['user_name'], 30);
+}
 
 // Set up page variables
 $page_title = 'Y | Home';
@@ -78,13 +88,12 @@ ob_start();
                                 maxlength="280" 
                                 placeholder="What's happening?"
                             ></textarea>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="text-primary">
-                                <i class="bi bi-image me-2"></i>
-                                <i class="bi bi-emoji-smile me-2"></i>
-                                <i class="bi bi-geo-alt"></i>
+                            <div id="composer-preview" class="composer-preview mt-2 p-2 border rounded bg-light mb-3">
+                                <div class="small text-muted mb-1">Preview:</div>
+                                <div id="preview-content"></div>
                             </div>
+                        </div>
+                        <div class="d-flex justify-content-end mt-3">
                             <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold">
                                 Post
                             </button>
@@ -95,30 +104,51 @@ ob_start();
         </div>
     </div>
 
-    <!-- Feed divider -->
+    <!-- Feed tabs configuration -->
+    <?php
+    $tabs = [
+        [
+            'id' => 'recommended',
+            'label' => 'Recommended',
+            'url' => "?tab=recommended",
+            'icon' => 'magic'
+        ],
+        [
+            'id' => 'following',
+            'label' => 'Following',
+            'url' => "?tab=following",
+            'icon' => 'people-fill'
+        ]
+    ];
+
+    include __DIR__ . '/../../resources/components/tabs_navigation.php';
+    ?>
+
+    <!-- Feed content label -->
     <div class="py-2 px-3 mb-3 bg-light rounded-3 d-flex align-items-center border">
-        <div class="text-primary fw-semibold">
-            <i class="bi bi-stars me-1"></i> Latest posts
-        </div>
+        <?php if ($active_tab === 'recommended'): ?>
+            <div class="text-primary fw-semibold">
+                <i class="bi bi-stars me-1"></i> Recommended for you
+            </div>
+        <?php else: ?>
+            <div class="text-primary fw-semibold">
+                <i class="bi bi-stars me-1"></i> Latest posts
+            </div>
+        <?php endif; ?>
     </div>
 
     <!-- Posts -->
     <div class="posts-container">
         <?php if (empty($posts)): ?>
-            <div class="card border-0 shadow-sm rounded-4 p-5 text-center text-muted">
-                <div class="mb-4">
-                    <i class="bi bi-chat-square-text" style="font-size: 3rem;"></i>
-                </div>
-                <h5>No posts yet</h5>
-                <p class="text-muted">Follow some users to see their posts in your feed!</p>
-            </div>
+            <?php 
+                $icon = $active_tab === 'recommended' ? 'magic' : 'chat-square-text';
+                $title = $active_tab === 'recommended' ? 'No recommendations yet' : 'No posts yet';
+                $message = $active_tab === 'recommended' ? 'Like some posts to get personalized recommendations!' : 'Follow some users to see their posts in your feed!';
+                include __DIR__ . '/../../resources/components/empty_state.php'; 
+            ?>
         <?php else: ?>
             <?php foreach ($posts as $post): ?>
-                <div class="card border-0 shadow-sm rounded-4 mb-3 hover-post">
-                    <div class="card-body p-0">
-                        <?php include __DIR__ . '/../../resources/components/post_item.php'; ?>
-                    </div>
-                </div>
+                <?php include __DIR__ . '/../../resources/components/post_card.php'; ?>
             <?php endforeach; ?>
         <?php endif; ?>
     </div>
@@ -140,7 +170,47 @@ ob_start();
     .tweet {
         border-bottom: none !important;
     }
+    .composer-preview {
+        display: none;
+    }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Composer text preview functionality
+    const composer = document.querySelector('.composer');
+    const previewDiv = document.getElementById('composer-preview');
+    const previewContent = document.getElementById('preview-content');
+    
+    if (composer) {
+        composer.addEventListener('input', function() {
+            updatePreview();
+        });
+        
+        // Initialize preview on page load
+        updatePreview();
+    }
+});
+
+// Update text preview
+function updatePreview() {
+    const composer = document.querySelector('.composer');
+    const previewDiv = document.getElementById('composer-preview');
+    const previewContent = document.getElementById('preview-content');
+    
+    if (!composer || !previewDiv || !previewContent) return;
+    
+    const content = composer.value;
+    
+    // Format with hashtags and mentions
+    const formattedContent = content.replace(/#([a-zA-Z0-9\-_]+)/g, '<span class="text-primary fw-medium">#$1</span>')
+                                .replace(/@([a-zA-Z0-9_]+)/g, '<span class="text-primary fw-medium">@$1</span>');
+    
+    // Always show preview regardless of content
+    previewContent.innerHTML = formattedContent || '<span class="text-muted">(Your post will appear here)</span>';
+    previewDiv.style.display = 'block';
+}
+</script>
 
 <?php
 $content = ob_get_clean();
