@@ -20,6 +20,9 @@ require_once __DIR__ . '/functions/tag_functions.php';
 // Bookmark functions
 require_once __DIR__ . '/functions/bookmark_functions.php';
 
+// Notification functions
+require_once __DIR__ . '/functions/notification_functions.php';
+
 /**
  * Generate or retrieve CSRF token
  * 

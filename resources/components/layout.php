@@ -9,6 +9,32 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    
+    <style>
+        /* Global notification icon styles */
+        .icon-wrapper {
+            transition: all 0.2s ease;
+        }
+        
+        .icon-wrapper:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Badge styles */
+        .badge.rounded-pill {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 1.2rem;
+            height: 1.2rem;
+        }
+        
+        /* Notification card transition */
+        .notification-unread {
+            border-left: 4px solid var(--bs-primary) !important;
+            background-color: rgba(13, 110, 253, 0.03);
+        }
+    </style>
 </head>
 <body>
     <div class="container-fluid">

@@ -22,6 +22,18 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
                     </a>
                 </li>
                 <li class="nav-item mb-2">
+                    <a href="/y/public/app/notifications.php" class="nav-link d-flex align-items-center p-2 text-dark text-decoration-none rounded-3 hover-bg-light <?php echo strpos($_SERVER['PHP_SELF'], 'notifications.php') !== false ? 'active fw-bold' : ''; ?>">
+                        <i class="bi bi-bell fs-5 me-3"></i>
+                        <span>Notifications</span>
+                        <?php 
+                            $unread_count = count_unread_notifications($conn, $user['user_name']); 
+                            if ($unread_count > 0):
+                        ?>
+                            <span class="badge rounded-pill bg-danger ms-auto"><?php echo $unread_count > 9 ? '9+' : $unread_count; ?></span>
+                        <?php endif; ?>
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
                     <a href="/y/public/app/search.php" class="nav-link d-flex align-items-center p-2 text-dark text-decoration-none rounded-3 hover-bg-light <?php echo strpos($_SERVER['PHP_SELF'], 'search.php') !== false ? 'active fw-bold' : ''; ?>">
                         <i class="bi bi-search fs-5 me-3"></i>
                         <span>Search</span>
@@ -49,7 +61,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
                     <div class="d-flex align-items-center">
                         <a href="/y/public/app/profile.php?username=<?php echo $user['user_name']; ?>" class="text-decoration-none text-reset me-3">
                             <?php 
-                                $profile_picture_url = $user['profile_picture_url'];
+                                $profile_picture_url = $user['profile_picture_url'] ?? null;
                                 $username = $user['user_name'];
                                 $size = '48';
                                 include __DIR__ . '/user_avatar.php'; 
@@ -77,3 +89,17 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
         </div>
     </div>
 </div>
+
+<style>
+    .nav-icon-container {
+        width: 24px;
+        display: flex;
+        justify-content: center;
+    }
+    
+    .notification-badge {
+        font-size: 0.6rem;
+        padding: 0.25rem 0.4rem;
+        transform: translate(25%, -25%) !important;
+    }
+</style>

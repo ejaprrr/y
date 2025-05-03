@@ -61,7 +61,12 @@ function follow_user($conn, $user_name, $target_user_name) {
     
     $stmt = $conn->prepare("INSERT IGNORE INTO follows (user_name, following_user_name) VALUES (?, ?)");
     $stmt->bind_param("ss", $user_name, $target_user_name);
-    return $stmt->execute();
+    $success = $stmt->execute();
+    
+    // Create notification for the followed user
+    create_notification($conn, 'follow', $target_user_name, $user_name);
+    
+    return $success;
 }
 
 /**

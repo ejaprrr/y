@@ -105,6 +105,23 @@ function create_post($conn, $user_name, $content, $target_post_id = null) {
         if ($stmt->execute()) {
             $post_id = $conn->insert_id;
             
+            // If this is a reply, notify the original author
+            if ($target_post_id && $post_id) {
+                $stmt = $conn->prepare("SELECT author_user_name FROM posts WHERE id = ?");
+                $stmt->bind_param("i", $target_post_id);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                
+                if ($result && $row = $result->fetch_assoc()) {
+                    create_notification($conn, 'reply', $row['author_user_name'], $user_name, $post_id);
+                }
+            }
+            
+            // Process mentions
+            if ($post_id) {
+                process_mentions($conn, $content, $user_name, $post_id);
+            }
+            
             // Process hashtags
             if (function_exists('process_content_tags')) {
                 process_content_tags($conn, $content);
@@ -134,7 +151,19 @@ function create_post($conn, $user_name, $content, $target_post_id = null) {
 function like_post($conn, $user_name, $post_id) {
     $stmt = $conn->prepare("INSERT IGNORE INTO likes (user_name, post_id) VALUES (?, ?)");
     $stmt->bind_param("si", $user_name, $post_id);
-    return $stmt->execute();
+    $success = $stmt->execute();
+    
+    // Get post author to notify them
+    $stmt = $conn->prepare("SELECT author_user_name FROM posts WHERE id = ?");
+    $stmt->bind_param("i", $post_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result && $row = $result->fetch_assoc()) {
+        create_notification($conn, 'like', $row['author_user_name'], $user_name, $post_id);
+    }
+    
+    return $success;
 }
 
 /**
@@ -178,7 +207,19 @@ function has_liked($conn, $user_name, $post_id) {
 function repost_post($conn, $user_name, $post_id) {
     $stmt = $conn->prepare("INSERT IGNORE INTO reposts (user_name, post_id) VALUES (?, ?)");
     $stmt->bind_param("si", $user_name, $post_id);
-    return $stmt->execute();
+    $success = $stmt->execute();
+    
+    // Get post author to notify them
+    $stmt = $conn->prepare("SELECT author_user_name FROM posts WHERE id = ?");
+    $stmt->bind_param("i", $post_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result && $row = $result->fetch_assoc()) {
+        create_notification($conn, 'repost', $row['author_user_name'], $user_name, $post_id);
+    }
+    
+    return $success;
 }
 
 /**

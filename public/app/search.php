@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 // Set up page variables
 $page_title = 'Y | Search';
-$page_header = 'Search Results';
+$page_header = 'Search';
 
 // Highlight search terms in text
 function highlight_terms($text, $search_terms) {
