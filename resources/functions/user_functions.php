@@ -137,7 +137,7 @@ function get_user_stats($conn, $user_name) {
  */
 function update_user_profile($conn, $user_name, $data) {
     // Only allow certain fields to be updated
-    $allowed_fields = ['profile_bio_content', 'display_name', 'profile_image'];
+    $allowed_fields = ['profile_bio_content', 'display_name', 'profile_picture_url'];
     
     $fields_to_update = [];
     $types = '';

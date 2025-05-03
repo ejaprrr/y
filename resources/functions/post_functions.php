@@ -14,7 +14,8 @@ function format_post_data($row) {
     return [
         'id' => $row['id'],
         'username' => $row['author_user_name'] ?? $row['user_name'] ?? '',
-        'display_name' => $row['author_user_name'] ?? $row['user_name'] ?? '',
+        'display_name' => $row['display_name'] ?? $row['user_name'] ?? '',
+        'profile_picture_url' => $row['profile_picture_url'] ?? null,
         'content' => $row['text_content'] ?? '',
         'timestamp' => format_timestamp($row['created_at']),
         'raw_timestamp' => $row['created_at'] ?? '',
@@ -44,6 +45,8 @@ function get_post($conn, $post_id, $current_user) {
         SELECT 
             p.*, 
             u.user_name,
+            u.display_name,
+            u.profile_picture_url,
             (SELECT COUNT(*) FROM likes WHERE post_id = p.id) AS like_count,
             EXISTS(SELECT 1 FROM likes WHERE post_id = p.id AND user_name = ?) AS user_liked,
             (SELECT COUNT(*) FROM reposts WHERE post_id = p.id) AS repost_count,
@@ -197,6 +200,8 @@ function get_feed_posts($conn, $user_name, $limit = 30) {
             (SELECT 
                 p.*, 
                 u.user_name,
+                u.display_name,
+                u.profile_picture_url,
                 NULL as reposted_by,
                 NULL as reply_to_username,
                 NULL as reply_to_content,
@@ -216,10 +221,12 @@ function get_feed_posts($conn, $user_name, $limit = 30) {
             (SELECT 
                 p.*, 
                 u.user_name,
+                u.display_name,
+                u.profile_picture_url,
                 r.user_name as reposted_by,
-                NULL as reply_to_username,
-                NULL as reply_to_content,
-                NULL as reply_to_id,
+                target_u.user_name as reply_to_username,
+                target_p.text_content as reply_to_content,
+                target_p.id as reply_to_id,
                 (SELECT COUNT(*) FROM likes WHERE post_id = p.id) AS like_count,
                 EXISTS(SELECT 1 FROM likes WHERE post_id = p.id AND user_name = ?) AS user_liked,
                 (SELECT COUNT(*) FROM reposts WHERE post_id = p.id) AS repost_count,
@@ -229,14 +236,17 @@ function get_feed_posts($conn, $user_name, $limit = 30) {
             FROM posts p
             JOIN users u ON p.author_user_name = u.user_name
             JOIN reposts r ON p.id = r.post_id
-            WHERE p.target_post_id IS NULL
-            AND r.user_name = ?)
+            LEFT JOIN posts target_p ON p.target_post_id = target_p.id
+            LEFT JOIN users target_u ON target_p.author_user_name = target_u.user_name
+            WHERE r.user_name = ?)
 
             UNION ALL
             
             (SELECT 
                 p.*, 
                 u.user_name,
+                u.display_name,
+                u.profile_picture_url,
                 NULL as reposted_by,
                 target_u.user_name as reply_to_username,
                 target_p.text_content as reply_to_content,
@@ -300,6 +310,8 @@ function get_user_posts($conn, $profile_username, $current_user, $type = 'posts'
             (SELECT 
                 p.*, 
                 u.user_name,
+                u.display_name,
+                u.profile_picture_url,
                 NULL as reposted_by,
                 NULL as reply_to_username,
                 NULL as reply_to_content,
@@ -319,10 +331,12 @@ function get_user_posts($conn, $profile_username, $current_user, $type = 'posts'
             (SELECT 
                 p.*, 
                 u.user_name,
+                u.display_name,
+                u.profile_picture_url,
                 r.user_name as reposted_by,
-                NULL as reply_to_username,
-                NULL as reply_to_content,
-                NULL as reply_to_id,
+                target_u.user_name as reply_to_username,
+                target_p.text_content as reply_to_content,
+                target_p.id as reply_to_id,
                 (SELECT COUNT(*) FROM likes WHERE post_id = p.id) AS like_count,
                 EXISTS(SELECT 1 FROM likes WHERE post_id = p.id AND user_name = ?) AS user_liked,
                 (SELECT COUNT(*) FROM reposts WHERE post_id = p.id) AS repost_count,
@@ -332,6 +346,8 @@ function get_user_posts($conn, $profile_username, $current_user, $type = 'posts'
             FROM posts p
             JOIN users u ON p.author_user_name = u.user_name
             JOIN reposts r ON p.id = r.post_id
+            LEFT JOIN posts target_p ON p.target_post_id = target_p.id
+            LEFT JOIN users target_u ON target_p.author_user_name = target_u.user_name
             WHERE r.user_name = ?)
             
             ORDER BY sort_time DESC
@@ -339,11 +355,13 @@ function get_user_posts($conn, $profile_username, $current_user, $type = 'posts'
         ");
         $stmt->bind_param("ssssssi", $current_user, $current_user, $profile_username, $current_user, $current_user, $profile_username, $limit);
     } else {
-        // Get replies
+        // This is the "replies" tab - no changes needed here
         $stmt = $conn->prepare("
             SELECT 
                 p.*, 
                 u.user_name,
+                u.display_name,
+                u.profile_picture_url,
                 NULL as reposted_by,
                 target_u.user_name as reply_to_username,
                 target_p.text_content as reply_to_content,
@@ -389,6 +407,8 @@ function get_post_replies($conn, $post_id, $current_user) {
         SELECT 
             p.*, 
             u.user_name,
+            u.display_name,
+            u.profile_picture_url,
             (SELECT COUNT(*) FROM likes WHERE post_id = p.id) AS like_count,
             EXISTS(SELECT 1 FROM likes WHERE post_id = p.id AND user_name = ?) AS user_liked,
             (SELECT COUNT(*) FROM reposts WHERE post_id = p.id) AS repost_count,
@@ -410,5 +430,119 @@ function get_post_replies($conn, $post_id, $current_user) {
     }
     
     return $replies;
+}
+
+/**
+ * Delete a post and all its associated data
+ * 
+ * @param mysqli $conn Database connection
+ * @param int $post_id Post ID to delete
+ * @param string $user_name User attempting to delete the post
+ * @return bool Success status
+ */
+function delete_post($conn, $post_id, $user_name) {
+    // First, verify that the user is the author of this post
+    $stmt = $conn->prepare("SELECT author_user_name FROM posts WHERE id = ?");
+    $stmt->bind_param("i", $post_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result && $result->num_rows > 0) {
+        $post = $result->fetch_assoc();
+        
+        // Check if user is the author
+        if ($post['author_user_name'] !== $user_name) {
+            return false; // Not authorized
+        }
+        
+        // Begin transaction to ensure all related data is deleted
+        $conn->begin_transaction();
+        
+        try {
+            // Step 1: Find all replies to this post (for recursion)
+            $stmt = $conn->prepare("SELECT id FROM posts WHERE target_post_id = ?");
+            $stmt->bind_param("i", $post_id);
+            $stmt->execute();
+            $replies_result = $stmt->get_result();
+            $reply_ids = [];
+            
+            while ($reply = $replies_result->fetch_assoc()) {
+                $reply_ids[] = $reply['id'];
+                // Recursively delete each reply and its children
+                delete_post_cascade($conn, $reply['id']);
+            }
+            
+            // Step 2: Delete likes for this post
+            $stmt = $conn->prepare("DELETE FROM likes WHERE post_id = ?");
+            $stmt->bind_param("i", $post_id);
+            $stmt->execute();
+            
+            // Step 3: Delete reposts for this post
+            $stmt = $conn->prepare("DELETE FROM reposts WHERE post_id = ?");
+            $stmt->bind_param("i", $post_id);
+            $stmt->execute();
+            
+            // Step 4: Delete the post itself
+            $stmt = $conn->prepare("DELETE FROM posts WHERE id = ?");
+            $stmt->bind_param("i", $post_id);
+            $success = $stmt->execute();
+            
+            // Commit the transaction
+            if ($success) {
+                $conn->commit();
+                return true;
+            } else {
+                $conn->rollback();
+                return false;
+            }
+        } catch (Exception $e) {
+            // Something went wrong, rollback
+            $conn->rollback();
+            error_log("Error deleting post: " . $e->getMessage());
+            return false;
+        }
+    }
+    
+    return false;
+}
+
+/**
+ * Helper function for recursive deletion of post tree
+ * 
+ * @param mysqli $conn Database connection
+ * @param int $post_id Post ID to delete
+ * @return bool Success status
+ */
+function delete_post_cascade($conn, $post_id) {
+    try {
+        // Step 1: Find all replies to this post
+        $stmt = $conn->prepare("SELECT id FROM posts WHERE target_post_id = ?");
+        $stmt->bind_param("i", $post_id);
+        $stmt->execute();
+        $replies_result = $stmt->get_result();
+        
+        // Step 2: Recursively delete each reply
+        while ($reply = $replies_result->fetch_assoc()) {
+            delete_post_cascade($conn, $reply['id']);
+        }
+        
+        // Step 3: Delete likes for this post
+        $stmt = $conn->prepare("DELETE FROM likes WHERE post_id = ?");
+        $stmt->bind_param("i", $post_id);
+        $stmt->execute();
+        
+        // Step 4: Delete reposts for this post
+        $stmt = $conn->prepare("DELETE FROM reposts WHERE post_id = ?");
+        $stmt->bind_param("i", $post_id);
+        $stmt->execute();
+        
+        // Step 5: Delete the post itself
+        $stmt = $conn->prepare("DELETE FROM posts WHERE id = ?");
+        $stmt->bind_param("i", $post_id);
+        return $stmt->execute();
+    } catch (Exception $e) {
+        error_log("Error in cascade delete: " . $e->getMessage());
+        return false;
+    }
 }
 ?>

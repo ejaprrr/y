@@ -41,113 +41,109 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 // Get feed posts
 $posts = get_feed_posts($conn, $user['user_name'], 30);
+
+// Set up page variables
+$page_title = 'Y | Home';
+$page_header = 'Home';
+
+// Capture content in a buffer
+ob_start();
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Y | feed</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <style>
-        .tweet:hover { background-color: #f8f9fa; }
-    </style>
-</head>
-<body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <?php include_once __DIR__ . '/../../resources/components/sidebar.php'; ?>
-            
-            <!-- Main content -->
-            <div class="col-md-6 px-0 border-end">
-                <div class="fw-bold fs-4 p-3 border-bottom">Home</div>
-                
-                <div class="p-3 border-bottom">
+<div class="feed-container p-3">
+    <!-- New post form -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-3">
+            <div class="d-flex">
+                <div class="me-3">
+                    <div class="rounded-circle overflow-hidden" style="width: 48px; height: 48px; background-color: #f8f9fa;">
+                        <?php if (!empty($user['profile_picture_url'])): ?>
+                            <img src="<?php echo htmlspecialchars($user['profile_picture_url']); ?>" 
+                                 alt="<?php echo htmlspecialchars($user['user_name']); ?>" 
+                                 class="img-fluid" style="width: 100%; height: 100%; object-fit: cover;">
+                        <?php else: ?>
+                            <div class="d-flex justify-content-center align-items-center h-100">
+                                <i class="bi bi-person-circle text-secondary" style="font-size: 2rem;"></i>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <div class="flex-grow-1">
                     <form method="post" action="">
-                        <textarea name="tweet_content" class="form-control border-0 mb-3" rows="3" maxlength="280" placeholder="What's happening?"></textarea>
-                        <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary rounded-pill px-4">Post</button>
+                        <div class="position-relative">
+                            <textarea 
+                                name="tweet_content" 
+                                class="form-control border-0 fs-5 mb-3 composer" 
+                                rows="2"
+                                maxlength="280" 
+                                placeholder="What's happening?"
+                            ></textarea>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="text-primary">
+                                <i class="bi bi-image me-2"></i>
+                                <i class="bi bi-emoji-smile me-2"></i>
+                                <i class="bi bi-geo-alt"></i>
+                            </div>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold">
+                                Post
+                            </button>
                         </div>
                     </form>
                 </div>
-                
-                <div id="feed">
-                    <?php foreach ($posts as $post): ?>
-                        <div class="tweet p-3 border-bottom" id="post-<?php echo $post['id']; ?>">
-                            <?php if ($post['reposted_by']): ?>
-                                <div class="text-muted mb-2 small">
-                                    <i class="bi bi-repeat"></i> Reposted by @<?php echo htmlspecialchars($post['reposted_by']); ?>
-                                </div>
-                            <?php endif; ?>
-                            
-                            <?php if ($post['reply_to_username']): ?>
-                                <div class="text-muted mb-2 small">
-                                    <i class="bi bi-chat"></i> @<?php echo htmlspecialchars($post['username']); ?> replying to @<?php echo htmlspecialchars($post['reply_to_username']); ?>
-                                    <div class="ms-3 ps-2 border-start text-muted">
-                                        <p class="small text-truncate m-0">"<?php echo htmlspecialchars($post['reply_to_content']); ?>"</p>
-                                    </div>
-                                </div>
-                            <?php endif; ?>
-                            
-                            <div class="d-flex gap-2 mb-1">
-                                <div class="fw-bold"><?php echo htmlspecialchars($post['display_name']); ?></div>
-                                <div>
-                                    <a href="profile.php?username=<?php echo $post['username']; ?>" class="text-decoration-none text-muted">
-                                        @<?php echo htmlspecialchars($post['username']); ?>
-                                    </a>
-                                </div>
-                                <div class="text-muted">·</div>
-                                <div class="text-muted"><?php echo htmlspecialchars($post['timestamp']); ?></div>
-                            </div>
-                            
-                            <p class="mb-2">
-                                <a href="post.php?id=<?php echo $post['id']; ?>" class="text-decoration-none text-dark">
-                                    <?php echo htmlspecialchars($post['content']); ?>
-                                </a>
-                            </p>
-                            
-                            <div class="d-flex gap-4">
-                                <form method="post" class="d-inline">
-                                    <input type="hidden" name="action" value="like">
-                                    <input type="hidden" name="tweet_id" value="<?php echo $post['id']; ?>">
-                                    <button type="submit" class="btn btn-sm text-muted p-0 border-0">
-                                        <?php echo $post['user_liked'] ? '<i class="bi bi-heart-fill text-danger"></i>' : '<i class="bi bi-heart"></i>'; ?> 
-                                        <span class="small"><?php echo $post['like_count']; ?></span>
-                                    </button>
-                                </form>
-                                
-                                <form method="post" class="d-inline">
-                                    <input type="hidden" name="action" value="repost">
-                                    <input type="hidden" name="tweet_id" value="<?php echo $post['id']; ?>">
-                                    <button type="submit" class="btn btn-sm text-muted p-0 border-0">
-                                        <?php echo $post['user_reposted'] ? '<i class="bi bi-repeat text-success"></i>' : '<i class="bi bi-repeat"></i>'; ?>
-                                        <span class="small"><?php echo $post['repost_count']; ?></span>
-                                    </button>
-                                </form>
-                                
-                                <form method="post" action="post.php?id=<?php echo $post['id']; ?>" class="d-inline">
-                                    <button type="submit" class="btn btn-sm text-muted p-0 border-0">
-                                        <i class="bi bi-chat"></i>
-                                        <span class="small"><?php if ($post['reply_count'] > 0): ?><?php echo $post['reply_count']; ?><?php endif; ?></span>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
             </div>
-            
-            <!-- Right column -->
-            <?php include_once __DIR__ . '/../../resources/components/right_sidebar.php'; ?>
         </div>
     </div>
-    
-    <!-- Bootstrap JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+
+    <!-- Feed divider -->
+    <div class="py-2 px-3 mb-3 bg-light rounded-3 d-flex align-items-center border">
+        <div class="text-primary fw-semibold">
+            <i class="bi bi-stars me-1"></i> Latest posts
+        </div>
+    </div>
+
+    <!-- Posts -->
+    <div class="posts-container">
+        <?php if (empty($posts)): ?>
+            <div class="card border-0 shadow-sm rounded-4 p-5 text-center text-muted">
+                <div class="mb-4">
+                    <i class="bi bi-chat-square-text" style="font-size: 3rem;"></i>
+                </div>
+                <h5>No posts yet</h5>
+                <p class="text-muted">Follow some users to see their posts in your feed!</p>
+            </div>
+        <?php else: ?>
+            <?php foreach ($posts as $post): ?>
+                <div class="card border-0 shadow-sm rounded-4 mb-3 hover-post">
+                    <div class="card-body p-0">
+                        <?php include __DIR__ . '/../../resources/components/post_item.php'; ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
+</div>
+
+<style>
+    .composer {
+        min-height: 80px;
+        font-size: 1.1rem !important;
+    }
+    .composer:focus {
+        box-shadow: none;
+    }
+    .hover-post:hover {
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.12) !important;
+        transform: translateY(-2px);
+        transition: all 0.2s ease;
+    }
+    .tweet {
+        border-bottom: none !important;
+    }
+</style>
+
+<?php
+$content = ob_get_clean();
+// Render with layout
+include __DIR__ . '/../../resources/components/layout.php';
+?>
