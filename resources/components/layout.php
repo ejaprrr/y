@@ -1,12 +1,15 @@
-<?php 
-// Set page title if not already set
-if (!isset($page_title)) {
-    $page_title = 'Y';
-}
-?>
-
-<?php include __DIR__ . '/header.php'; ?>
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo $page_title ?? 'Y'; ?></title>
+    <meta name="csrf-token" content="<?php echo get_csrf_token(); ?>">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
 <body>
     <div class="container-fluid">
         <div class="row">
@@ -101,7 +104,43 @@ if (!isset($page_title)) {
                 });
             });
         });
+        
+        // Toast notification function
+        function showToast(type, message) {
+            const container = document.getElementById('toast-container');
+            const toastId = 'toast-' + Date.now();
+            
+            const toastHTML = `
+                <div id="${toastId}" class="toast align-items-center border-0 text-white bg-${type === 'error' ? 'danger' : 'primary'}" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', toastHTML);
+            
+            const toastElement = document.getElementById(toastId);
+            const toast = new bootstrap.Toast(toastElement, { delay: 3000 });
+            toast.show();
+            
+            // Clean up after hiding
+            toastElement.addEventListener('hidden.bs.toast', function () {
+                toastElement.remove();
+            });
+        }
     </script>
+    
+    <!-- Toast notification system -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+        <div id="toast-container"></div>
+    </div>
+    
+    <!-- Custom JS -->
+    <script src="/y/public/js/post-actions.js"></script>
     
     <?php if (isset($extra_scripts)): ?>
     <script>

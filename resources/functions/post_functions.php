@@ -429,13 +429,14 @@ function get_post_replies($conn, $post_id, $current_user) {
  */
 function delete_post($conn, $post_id, $user_name) {
     // First, verify that the user is the author of this post
-    $stmt = $conn->prepare("SELECT author_user_name FROM posts WHERE id = ?");
+    $stmt = $conn->prepare("SELECT author_user_name, text_content FROM posts WHERE id = ?");
     $stmt->bind_param("i", $post_id);
     $stmt->execute();
     $result = $stmt->get_result();
     
     if ($result && $result->num_rows > 0) {
         $post = $result->fetch_assoc();
+        $post_content = $post['text_content']; // Store content for hashtag processing
         
         // Check if user is the author
         if ($post['author_user_name'] !== $user_name) {
@@ -447,7 +448,7 @@ function delete_post($conn, $post_id, $user_name) {
         
         try {
             // Step 1: Find all replies to this post (for recursion)
-            $stmt = $conn->prepare("SELECT id FROM posts WHERE target_post_id = ?");
+            $stmt = $conn->prepare("SELECT id, text_content FROM posts WHERE target_post_id = ?");
             $stmt->bind_param("i", $post_id);
             $stmt->execute();
             $replies_result = $stmt->get_result();
@@ -455,6 +456,8 @@ function delete_post($conn, $post_id, $user_name) {
             
             while ($reply = $replies_result->fetch_assoc()) {
                 $reply_ids[] = $reply['id'];
+                // Process hashtags for replies before deleting
+                process_hashtag_deletion($conn, $reply['text_content']);
                 // Recursively delete each reply and its children
                 delete_post_cascade($conn, $reply['id']);
             }
@@ -469,7 +472,15 @@ function delete_post($conn, $post_id, $user_name) {
             $stmt->bind_param("i", $post_id);
             $stmt->execute();
             
-            // Step 4: Delete the post itself
+            // Step 4: Delete bookmarks for this post
+            $stmt = $conn->prepare("DELETE FROM bookmarks WHERE post_id = ?");
+            $stmt->bind_param("i", $post_id);
+            $stmt->execute();
+            
+            // Step 5: Process hashtags before deleting the post
+            process_hashtag_deletion($conn, $post_content);
+            
+            // Step 6: Delete the post itself
             $stmt = $conn->prepare("DELETE FROM posts WHERE id = ?");
             $stmt->bind_param("i", $post_id);
             $success = $stmt->execute();
@@ -502,15 +513,27 @@ function delete_post($conn, $post_id, $user_name) {
  */
 function delete_post_cascade($conn, $post_id) {
     try {
-        // Step 1: Find all replies to this post
-        $stmt = $conn->prepare("SELECT id FROM posts WHERE target_post_id = ?");
+        // First get the post content for hashtag processing
+        $stmt = $conn->prepare("SELECT text_content FROM posts WHERE id = ?");
         $stmt->bind_param("i", $post_id);
         $stmt->execute();
-        $replies_result = $stmt->get_result();
+        $result = $stmt->get_result();
         
-        // Step 2: Recursively delete each reply
-        while ($reply = $replies_result->fetch_assoc()) {
-            delete_post_cascade($conn, $reply['id']);
+        if ($result->num_rows > 0) {
+            $post = $result->fetch_assoc();
+            $post_content = $post['text_content'];
+            
+            // Step 1: Find all replies to this post
+            $stmt = $conn->prepare("SELECT id, text_content FROM posts WHERE target_post_id = ?");
+            $stmt->bind_param("i", $post_id);
+            $stmt->execute();
+            $replies_result = $stmt->get_result();
+            
+            // Step 2: Recursively delete each reply
+            while ($reply = $replies_result->fetch_assoc()) {
+                process_hashtag_deletion($conn, $reply['text_content']);
+                delete_post_cascade($conn, $reply['id']);
+            }
         }
         
         // Step 3: Delete likes for this post
@@ -523,7 +546,17 @@ function delete_post_cascade($conn, $post_id) {
         $stmt->bind_param("i", $post_id);
         $stmt->execute();
         
-        // Step 5: Delete the post itself
+        // Step 5: Delete bookmarks for this post
+        $stmt = $conn->prepare("DELETE FROM bookmarks WHERE post_id = ?");
+        $stmt->bind_param("i", $post_id);
+        $stmt->execute();
+        
+        // Step 6: Process hashtags before deleting
+        if (isset($post_content)) {
+            process_hashtag_deletion($conn, $post_content);
+        }
+        
+        // Step 7: Delete the post itself
         $stmt = $conn->prepare("DELETE FROM posts WHERE id = ?");
         $stmt->bind_param("i", $post_id);
         return $stmt->execute();
@@ -594,5 +627,37 @@ function get_latest_posts($conn, $user_name, $limit = 30) {
     }
     
     return $posts;
+}
+
+/**
+ * Get like count for a post
+ * 
+ * @param mysqli $conn Database connection
+ * @param int $post_id Post ID
+ * @return int Number of likes
+ */
+function get_like_count($conn, $post_id) {
+    $stmt = $conn->prepare("SELECT COUNT(*) FROM likes WHERE post_id = ?");
+    $stmt->bind_param("i", $post_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_row();
+    return (int)$row[0];
+}
+
+/**
+ * Get repost count for a post
+ * 
+ * @param mysqli $conn Database connection
+ * @param int $post_id Post ID
+ * @return int Number of reposts
+ */
+function get_repost_count($conn, $post_id) {
+    $stmt = $conn->prepare("SELECT COUNT(*) FROM reposts WHERE post_id = ?");
+    $stmt->bind_param("i", $post_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_row();
+    return (int)$row[0];
 }
 ?>

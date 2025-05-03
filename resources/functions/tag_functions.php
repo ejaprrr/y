@@ -67,6 +67,49 @@ function process_content_tags($conn, $content) {
 }
 
 /**
+ * Process hashtags when a post is deleted
+ *
+ * @param mysqli $conn Database connection
+ * @param string $content Post content being deleted
+ * @return void
+ */
+function process_hashtag_deletion($conn, $content) {
+    // Extract hashtags from the deleted content
+    $hashtags = extract_hashtags($content);
+    
+    if (empty($hashtags)) {
+        return;
+    }
+    
+    // Process each hashtag
+    foreach ($hashtags as $tag) {
+        // Check if hashtag exists
+        $stmt = $conn->prepare("SELECT id, usage_count FROM hashtags WHERE tag_name = ? LIMIT 1");
+        $stmt->bind_param("s", $tag);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($result->num_rows > 0) {
+            // Get current usage count
+            $row = $result->fetch_assoc();
+            $new_count = max(0, $row['usage_count'] - 1); // Decrement but don't go below zero
+            
+            if ($new_count > 0) {
+                // Update the reduced usage count
+                $update_stmt = $conn->prepare("UPDATE hashtags SET usage_count = ? WHERE id = ?");
+                $update_stmt->bind_param("ii", $new_count, $row['id']);
+                $update_stmt->execute();
+            } else {
+                // If count is zero, delete the hashtag
+                $delete_stmt = $conn->prepare("DELETE FROM hashtags WHERE id = ?");
+                $delete_stmt->bind_param("i", $row['id']);
+                $delete_stmt->execute();
+            }
+        }
+    }
+}
+
+/**
  * Format post content - convert hashtags and mentions to links
  *
  * @param string $content Raw post content

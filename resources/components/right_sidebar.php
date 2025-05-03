@@ -55,9 +55,8 @@
                                         <div class="text-muted text-truncate">@<?php echo htmlspecialchars($recommended_user['user_name']); ?></div>
                                     </a>
                                 </div>
-                                <form method="post" action="/y/public/app/profile.php">
+                                <form method="post" action="/y/public/app/profile.php?username=<?php echo htmlspecialchars($recommended_user['user_name']); ?>">
                                     <input type="hidden" name="action" value="follow">
-                                    <input type="hidden" name="username" value="<?php echo htmlspecialchars($recommended_user['user_name']); ?>">
                                     <button type="submit" class="btn btn-primary btn-sm rounded-pill">Follow</button>
                                 </form>
                             </div>
@@ -117,7 +116,7 @@
                 <a href="#" class="text-muted text-decoration-none">Cookie Policy</a>
             </div>
             <div class="mt-2">
-                © 2025 Y, Inc.
+                © 2025 Y, All rights reserved.
             </div>
         </footer>
     </div>

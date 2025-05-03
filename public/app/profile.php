@@ -135,8 +135,8 @@ ob_start();
                 <?php if ($profile_username !== $user['user_name']): ?>
                     <form method="post">
                         <input type="hidden" name="action" value="follow">
-                        <button type="submit" class="btn <?php echo $is_following ? 'btn-outline-dark' : 'btn-primary'; ?> rounded-pill follow-button <?php echo $is_following ? 'following' : ''; ?>" style="min-width: 110px;">
-                            <?php echo $is_following ? '' : 'Follow'; ?>
+                        <button type="submit" class="btn <?php echo $is_following ? 'btn-outline-dark' : 'btn-primary'; ?> rounded-pill follow-button" style="min-width: 110px;">
+                            <?php echo $is_following ? 'Following' : 'Follow'; ?>
                         </button>
                     </form>
                 <?php else: ?>
