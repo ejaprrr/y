@@ -1,15 +1,28 @@
 <?php
-require 'src/functions/auth.php';
+require_once __DIR__ . "/src/functions/connection.php";
 
-function get_user() {
-    $stmt = $conn->prepare("SELECT password FROM users WHERE user_name = ?");
-    $stmt->bind_param("s", $username);
+function exists_user($user_name) {
+    $stmt = $conn->prepare("SELECT user_name FROM users WHERE user_name = ?");
+    $stmt->bind_param("s", $user_name);
     $stmt->execute();
     $stmt->store_result();
+    
     if ($stmt->num_rows > 0) {
-        $stmt->bind_result($hashed_password);
-        $stmt->fetch();
-        return $hashed_password;
+        $stmt->close();
+        return true;
     }
+}
+
+function add_user($user_name, $hashed_password) {
+    $stmt = $conn->prepare("INSERT INTO users (user_name, password) VALUES (?, ?)");
+    $stmt->bind_param("ss", $user_name, $hashed_password);
+    $success = $stmt->execute();
+    $stmt->close();
+
+    if ($success) {
+        return true;
+    }
+
+    return false;
 }
 ?>

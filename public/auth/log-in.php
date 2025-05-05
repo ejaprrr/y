@@ -1,21 +1,24 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 session_start();
-require "/src/functions/connection.php";
-require "/src/functions/auth.php";
-require "/src/functions/validation.php";
-require "/src/functions/helpers.php";
+require_once "../../src/functions/connection.php";
+require_once "../../src/functions/auth.php";
+require_once "../../src/functions/validation.php";
+require_once "../../src/functions/helpers.php";
 
 set_csrf_token();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     check_csrf_token();
 
-    $username = strtolower(trim($_POST['username'] ?? ''));
+    $user_name = strtolower(trim($_POST['user_name'] ?? ''));
     $password = $_POST['password'] ?? '';
 
-    $username_validation = validate_username($username);
-    if ($username_validation !== true) {
-        echo $username_validation;
+    $user_name_validation = validate_user_name($user_name);
+    if ($user_name_validation !== true) {
+        echo $user_name_validation;
         exit();
     }
 
@@ -25,14 +28,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
-    $verified = verify_user($username, $password);
+    $verified = verify_user($user_name, $password);
 
     if ($verified) {
         session_regenerate_id(true);
-        $_SESSION['user_name'] = $username;
+        $_SESSION['user_name'] = $user_name;
         redirect('/app/index.php');
     }
-    $stmt->close();
 }
 ?>
 
@@ -45,10 +47,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
 <form method="POST">
-    <input type="text" name="username">
+    <input type="text" name="user_name">
     <input type="password" name="password">
     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-    <input type="submit" name="login">
+    <input type="submit" value="Log in">
 </form>    
 </body>
 </html>

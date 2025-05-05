@@ -1,4 +1,6 @@
 <?php
+require_once "connection.php";
+
 function set_csrf_token() {
     if (empty($_SESSION['csrf_token'])) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -15,9 +17,9 @@ function get_user_from_session() {
     return $_SESSION['user_name'] ?? null;
 }
 
-function verify_user($username, $password) {
+function verify_user($user_name, $password) {
     $stmt = $conn->prepare("SELECT password FROM users WHERE user_name = ?");
-    $stmt->bind_param("s", $username);
+    $stmt->bind_param("s", $user_name);
     $stmt->execute();
     $stmt->store_result();
     if ($stmt->num_rows > 0) {
@@ -26,6 +28,8 @@ function verify_user($username, $password) {
 
         return password_verify($password, $hashed_password);
     }
+
+    $stmt->close();
 }
 
 ?>

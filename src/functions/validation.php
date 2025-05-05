@@ -1,41 +1,39 @@
 <?php
-function validate_username($username) {
-    if (empty($username)) {
-        return "Uživatelské jméno je povinné.";
+function validate_user_name($user_name) {
+    if (empty($user_name)) {
+        return "Username is required.";
     }
-    if (strlen($username) < 3 || strlen($username) > 24) {
-        return "Uživatelské jméno musí mít 3 až 24 znaků.";
+    if (strlen($user_name) < 3 || strlen($user_name) > 24) {
+        return "Username must be between 3 and 24 characters.";
     }
-    if (!preg_match('/^[a-z0-9_]+$/', $username)) {
-        return "Uživatelské jméno může obsahovat pouze malá písmena, čísla a podtržítka.";
+    if (!preg_match('/^[a-z0-9_]+$/', $user_name)) {
+        return "Username can only contain lowercase letters, numbers, and underscores.";
     }
-    if ($username[0] === '_') {
-        return "Uživatelské jméno nesmí začínat podtržítkem.";
+    if ($user_name[0] === '_') {
+        return "Username cannot start with an underscore.";
     }
     return true;
 }
-
 
 function validate_password($password) {
     if (empty($password)) {
-        return "Heslo je povinné.";
+        return "Password is required.";
     }
     if (strlen($password) < 8) {
-        return "Heslo musí mít alespoň 8 znaků.";
+        return "Password must be at least 8 characters long.";
     }
     if (!preg_match('/[a-z]/', $password)) {
-        return "Heslo musí obsahovat alespoň jedno malé písmeno.";
+        return "Password must contain at least one lowercase letter.";
     }
     if (!preg_match('/[A-Z]/', $password)) {
-        return "Heslo musí obsahovat alespoň jedno velké písmeno.";
+        return "Password must contain at least one uppercase letter.";
     }
     if (!preg_match('/[0-9]/', $password)) {
-        return "Heslo musí obsahovat alespoň jedno číslo.";
+        return "Password must contain at least one number.";
     }
     if (!preg_match('/[\W_]/', $password)) {
-        return "Heslo musí obsahovat alespoň jeden speciální znak.";
+        return "Password must contain at least one special character.";
     }
     return true;
 }
-
 ?>
