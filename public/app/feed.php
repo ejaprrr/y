@@ -73,47 +73,7 @@ ob_start();
 
 <div class="feed-container p-3">
     <!-- New post form -->
-    <div class="card border-0 shadow-sm rounded-4 mb-4">
-        <div class="card-body p-3">
-            <div class="d-flex">
-                <div class="me-3">
-                    <div class="rounded-circle overflow-hidden" style="width: 48px; height: 48px; background-color: #f8f9fa;">
-                        <?php if (!empty($user['profile_picture_url'])): ?>
-                            <img src="<?php echo htmlspecialchars($user['profile_picture_url']); ?>" 
-                                 alt="<?php echo htmlspecialchars($user['user_name']); ?>" 
-                                 class="img-fluid" style="width: 100%; height: 100%; object-fit: cover;">
-                        <?php else: ?>
-                            <div class="d-flex justify-content-center align-items-center h-100">
-                                <i class="bi bi-person-circle text-secondary" style="font-size: 2rem;"></i>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-                <div class="flex-grow-1">
-                    <form method="post" action="">
-                        <div class="position-relative">
-                            <textarea 
-                                name="tweet_content" 
-                                class="form-control border-0 fs-5 mb-3 composer" 
-                                rows="2"
-                                maxlength="280" 
-                                placeholder="What's happening?"
-                            ></textarea>
-                            <div id="composer-preview" class="composer-preview mt-2 p-2 border rounded bg-light mb-3">
-                                <div class="small text-muted mb-1">Preview:</div>
-                                <div id="preview-content"></div>
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-end mt-3">
-                            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold">
-                                Post
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+    <?php include __DIR__ . '/../../resources/components/modern_composer.php'; ?>
 
     <!-- Feed tabs configuration -->
     <?php

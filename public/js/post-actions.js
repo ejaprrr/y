@@ -47,6 +47,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return response.json();
       })
       .then((data) => {
+        console.log("Response data:", data); // Debug logging
         if (data.success) {
           updatePostUI(postId, action, data);
         } else {
@@ -66,7 +67,9 @@ document.addEventListener("DOMContentLoaded", function () {
    * Update the UI based on action response
    */
   function updatePostUI(postId, action, data) {
-    // Find all instances of this post on the page (could appear multiple times)
+    console.log(`Updating UI for ${action}:`, data);
+
+    // Find all instances of this post on the page
     const postActions = document.querySelectorAll(
       `.post-actions[data-post-id="${postId}"]`
     );
@@ -74,13 +77,21 @@ document.addEventListener("DOMContentLoaded", function () {
     postActions.forEach((postAction) => {
       // Update like UI
       if (action === "like") {
-        const likeIcon = postAction.querySelector(".like-icon");
+        const likeWrapper = postAction.querySelector(".like-icon-wrapper");
+        const likeIcon = likeWrapper ? likeWrapper.querySelector("i") : null;
         const likeCount = postAction.querySelector(".like-count");
 
-        if (likeIcon) {
-          likeIcon.innerHTML = data.liked
-            ? '<i class="bi bi-heart-fill text-danger"></i>'
-            : '<i class="bi bi-heart"></i>';
+        if (likeWrapper && likeIcon) {
+          if (data.liked) {
+            likeWrapper.classList.add("active");
+            // Force color update by setting style directly
+            likeIcon.className = "bi bi-heart-fill";
+            likeIcon.style.color = "#dc3545";
+          } else {
+            likeWrapper.classList.remove("active");
+            likeIcon.className = "bi bi-heart";
+            likeIcon.style.color = "#6c757d"; // Reset to default
+          }
         }
 
         if (likeCount && data.like_count !== undefined) {
@@ -89,14 +100,22 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       // Update repost UI
-      if (action === "repost") {
-        const repostIcon = postAction.querySelector(".repost-icon");
+      else if (action === "repost") {
+        const repostWrapper = postAction.querySelector(".repost-icon-wrapper");
+        const repostIcon = repostWrapper
+          ? repostWrapper.querySelector("i")
+          : null;
         const repostCount = postAction.querySelector(".repost-count");
 
-        if (repostIcon) {
-          repostIcon.innerHTML = data.reposted
-            ? '<i class="bi bi-repeat text-success"></i>'
-            : '<i class="bi bi-repeat"></i>';
+        if (repostWrapper && repostIcon) {
+          if (data.reposted) {
+            repostWrapper.classList.add("active");
+            // Force color update
+            repostIcon.style.color = "#198754";
+          } else {
+            repostWrapper.classList.remove("active");
+            repostIcon.style.color = "#6c757d"; // Reset to default
+          }
         }
 
         if (repostCount && data.repost_count !== undefined) {
@@ -105,13 +124,25 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       // Update bookmark UI
-      if (action === "bookmark") {
-        const bookmarkIcon = postAction.querySelector(".bookmark-icon");
+      else if (action === "bookmark") {
+        const bookmarkWrapper = postAction.querySelector(
+          ".bookmark-icon-wrapper"
+        );
+        const bookmarkIcon = bookmarkWrapper
+          ? bookmarkWrapper.querySelector("i")
+          : null;
 
-        if (bookmarkIcon) {
-          bookmarkIcon.innerHTML = data.bookmarked
-            ? '<i class="bi bi-bookmark-fill text-primary"></i>'
-            : '<i class="bi bi-bookmark"></i>';
+        if (bookmarkWrapper && bookmarkIcon) {
+          if (data.bookmarked) {
+            bookmarkWrapper.classList.add("active");
+            bookmarkIcon.className = "bi bi-bookmark-fill";
+            // Force color update
+            bookmarkIcon.style.color = "#0dcaf0";
+          } else {
+            bookmarkWrapper.classList.remove("active");
+            bookmarkIcon.className = "bi bi-bookmark";
+            bookmarkIcon.style.color = "#6c757d"; // Reset to default
+          }
         }
 
         const button = postAction.querySelector(`[data-action="bookmark"]`);
@@ -122,7 +153,5 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       }
     });
-
-    // Removed the showToast calls that were here
   }
 });

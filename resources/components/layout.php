@@ -10,6 +10,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     
+    <?php include __DIR__ . '/theme.php'; ?>
     <style>
         /* Global notification icon styles */
         .icon-wrapper {
@@ -33,6 +34,140 @@
         .notification-unread {
             border-left: 4px solid var(--bs-primary) !important;
             background-color: rgba(13, 110, 253, 0.03);
+        }
+        
+        /* Bubble-style action buttons */
+        .action-bubble {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        
+        .action-icon-wrapper {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+        
+        /* Default state */
+        .action-icon-wrapper i {
+            font-size: 1rem;
+            color: #6c757d;
+        }
+        
+        .action-count {
+            margin-left: 6px;
+            color: #6c757d;
+        }
+        
+        /* Like button - matches notification 'like' color */
+        .action-bubble:hover .like-icon-wrapper {
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+
+        .action-bubble:hover .like-icon-wrapper i {
+            color: #dc3545;
+        }
+
+        .like-icon-wrapper.active {
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+
+        .like-icon-wrapper.active i {
+            color: #dc3545 !important;
+        }
+
+        /* Repost button - matches notification 'repost' color */
+        .action-bubble:hover .repost-icon-wrapper {
+            background-color: rgba(25, 135, 84, 0.1);
+        }
+
+        .action-bubble:hover .repost-icon-wrapper i {
+            color: #198754;
+        }
+
+        .repost-icon-wrapper.active {
+            background-color: rgba(25, 135, 84, 0.1);
+        }
+
+        .repost-icon-wrapper.active i {
+            color: #198754 !important;
+        }
+
+        /* Reply button - matches notification 'reply' color */
+        .action-bubble:hover .reply-icon-wrapper {
+            background-color: rgba(13, 202, 240, 0.1);
+        }
+
+        .action-bubble:hover .reply-icon-wrapper i {
+            color: #0dcaf0;
+        }
+
+        /* Bookmark button - now uses yellow (warning) color from mentions */
+        .action-bubble:hover .bookmark-icon-wrapper {
+            background-color: rgba(255, 193, 7, 0.1);
+        }
+
+        .action-bubble:hover .bookmark-icon-wrapper i {
+            color: #ffc107;
+        }
+
+        .bookmark-icon-wrapper.active {
+            background-color: rgba(255, 193, 7, 0.1);
+        }
+
+        .bookmark-icon-wrapper.active i {
+            color: #ffc107 !important;
+        }
+        
+        /* Hover effect */
+        .action-bubble:hover .action-count {
+            color: #495057;
+        }
+        
+        /* Scale effect on click */
+        .action-bubble:active .action-icon-wrapper {
+            transform: scale(0.9);
+        }
+        
+        /* Bootstrap utilities and extensions */
+        .hover-bg-light:hover {
+            background-color: var(--bs-hover-bg) !important;
+        }
+        
+        .hover-card {
+            transition: all var(--bs-transition-speed);
+        }
+        
+        .hover-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--bs-card-shadow-hover) !important;
+        }
+        
+        /* Remove float effect from post cards for consistency */
+        .hover-post:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--bs-card-shadow-hover) !important;
+        }
+        
+        /* Unified animation classes */
+        .transition-all {
+            transition: all var(--bs-transition-speed);
+        }
+        
+        /* Action button animations */
+        .action-bubble:active .action-icon-wrapper {
+            transform: scale(0.92);
+        }
+        
+        /* Fix for reply/like counts */
+        .action-count {
+            min-width: 12px;
         }
     </style>
 </head>

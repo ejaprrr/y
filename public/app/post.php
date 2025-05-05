@@ -187,40 +187,13 @@ ob_start();
     <!-- Reply form -->
     <div class="card border-0 shadow-sm rounded-4 mb-3">
         <div class="card-body p-3">
-            <div class="d-flex">
-                <div class="me-3">
-                    <?php 
-                        $profile_picture_url = $user['profile_picture_url'];
-                        $username = $user['user_name'];
-                        $size = '48';
-                        include __DIR__ . '/../../resources/components/user_avatar.php'; 
-                    ?>
-                </div>
-                <div class="flex-grow-1">
-                    <form method="post" action="">
-                        <div class="position-relative">
-                            <textarea 
-                                name="tweet_content" 
-                                class="form-control border-0 mb-2 reply-composer" 
-                                rows="2" 
-                                maxlength="280" 
-                                placeholder="Post your reply"
-                            ></textarea>
-                            
-                            <div id="reply-preview" class="reply-preview mt-2 p-2 border rounded bg-light">
-                                <div class="small text-muted mb-1">Preview:</div>
-                                <div id="reply-preview-content"></div>
-                            </div>
-                        </div>
-                        
-                        <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary rounded-pill px-4">
-                                Reply
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+            <?php 
+            // Configure the modern composer for replies
+            $is_reply = true;
+            $placeholder = "Post your reply";
+            $parent_post_id = $main_post['id']; 
+            include __DIR__ . '/../../resources/components/modern_composer.php'; 
+            ?>
         </div>
     </div>
 
