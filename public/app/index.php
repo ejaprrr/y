@@ -4,24 +4,32 @@ session_start();
 require_once "../../src/functions/connection.php";
 require_once "../../src/functions/helpers.php";
 require_once "../../src/functions/post.php";
-require_once "../../src/components/post.php"; // Include the post component
+require_once "../../src/functions/validation.php";
+require_once "../../src/functions/user.php";
+require_once "../../src/components/post.php";
+require_once "../../src/components/layout.php";
 
 check_login();
 
-$user_name = $_SESSION['user_name'];
+$user = get_user($conn, $_SESSION['user_id'] ?? "");
 
+// handle post creation
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $content = trim($_POST['content'] ?? '');
+    $content = sanitize_post_content($_POST['content'] ?? '');
 
-    if (empty($content)) {
-        echo "Post content cannot be empty.";
+    $content_validation = validate_post_content($content);
+    if ($content_validation !== true) {
+        echo $content_validation;
         exit();
     }
 
-    if (add_post($conn, $user_name, $content)) {
+    $success = add_post($conn, $user["user_name"], $content);
+
+    if ($success) {
         redirect("index.php");
     } else {
         echo "Error saving post.";
+        exit();
     }
 }
 
@@ -29,30 +37,24 @@ $posts = get_posts($conn);
 
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome</title>
-</head>
-<body>
-    <h1>Welcome, <?= htmlspecialchars($user_name) ?>!</h1>
-    <a href="../auth/log-out.php">Log out</a>
+<?php render_header("feed"); ?>
 
-    <h2>Create a Post</h2>
-    <form method="POST">
-        <textarea name="content" placeholder="What's happening?" required></textarea>
-        <input type="submit" value="Post">
-    </form>
+<h1>welcome, <?= $user["user_name"] ?>!</h1>
+<a href="../auth/log-out.php">log out</a>
 
-    <h2>Recent Posts</h2>
-    <?php if (!empty($posts)): ?>
-        <?php foreach ($posts as $post): ?>
-            <?php render_post($post['user_name'], $post['content'], $post['created_at']); ?>
-        <?php endforeach; ?>
-    <?php else: ?>
-        <p>No posts yet. Be the first to post!</p>
-    <?php endif; ?>
-</body>
-</html>
+<h2>create a post</h2>
+<form method="POST">
+    <textarea name="content" placeholder="what's happening?" required></textarea>
+    <input type="submit" value="post">
+</form>
+
+<h2>recent posts</h2>
+<?php if (!empty($posts)): ?>
+    <?php foreach ($posts as $post): ?>
+        <?php render_post($post['user_name'], $post['content'], $post['created_at']); ?>
+    <?php endforeach; ?>
+<?php else: ?>
+    <p>no posts yet. be the first one!</p>
+<?php endif; ?>
+
+<?php render_footer(); ?>

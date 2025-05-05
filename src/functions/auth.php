@@ -8,25 +8,26 @@ function set_csrf_token() {
 }
 
 function check_csrf_token() {
-    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
-        die("Nesprávný požadavek.");
-    }
+    return hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '');
 }
 
-function get_user_name_from_session() {
-    return $_SESSION['user_name'] ?? null;
+function get_user_id_from_session() {
+    return $_SESSION['user_id'] ?? null;
 }
 
 function verify_user($conn, $user_name, $password) {
-    $stmt = $conn->prepare("SELECT password_hash FROM users WHERE user_name = ?");
+    $stmt = $conn->prepare("SELECT id, password_hash FROM users WHERE user_name = ?");
     $stmt->bind_param("s", $user_name);
     $stmt->execute();
     $result = $stmt->get_result();
     
     if ($row = $result->fetch_assoc()) {
         $hashed_password = $row['password_hash'];
+        $user_id = $row['id'];
         $stmt->close();
-        return password_verify($password, $hashed_password);
+        if (password_verify($password, $hashed_password)) {
+            return $user_id;
+        }
     }
     
     $stmt->close();

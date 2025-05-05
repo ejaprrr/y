@@ -5,32 +5,27 @@ require_once "../../src/functions/connection.php";
 require_once "../../src/functions/auth.php";
 require_once "../../src/functions/validation.php";
 require_once "../../src/functions/helpers.php";
+require_once "../../src/components/layout.php";
 
 set_csrf_token();
 
+// handle log in
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    check_csrf_token();
+    $valid = check_csrf_token();
+    if (!$valid) {
+        echo "Invalid CSRF token.";
+        exit();
+    }
 
-    $user_name = strtolower(trim($_POST['user_name'] ?? ''));
+    $user_name = sanitize_user_name($_POST['user_name'] ?? '');
     $password = $_POST['password'] ?? '';
 
-    $user_name_validation = validate_user_name($user_name);
-    if ($user_name_validation !== true) {
-        echo $user_name_validation;
-        exit();
-    }
+    $user_id = verify_user($conn, $user_name, $password);
 
-    $password_validation = validate_password($password);
-    if ($password_validation !== true) {
-        echo $password_validation;
-        exit();
-    }
-
-    $verified = verify_user($conn, $user_name, $password);
-    if ($verified) {
+    if ($user_id) {
         session_regenerate_id(true);
 
-        $_SESSION['user_name'] = $user_name;
+        $_SESSION['user_id'] = $user_id;
         redirect('../app/index.php');
     } else {
         echo "Invalid username or password.";
@@ -40,21 +35,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Log-in</title>
-</head>
-<body>
+<?php render_header("log in"); ?>
+
 <form method="POST">
     <input type="text" name="user_name">
     <input type="password" name="password">
     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-    <input type="submit" value="Log in">
+    <input type="submit" value="log in">
 </form>  
-<a href="sign-up.php">Sign up</a>  
-</body>
-</html>
+<a href="sign-up.php">sign up</a>  
 
+<?php render_footer(); ?>

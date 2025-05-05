@@ -6,13 +6,19 @@ require_once "../../src/functions/auth.php";
 require_once "../../src/functions/validation.php";
 require_once "../../src/functions/helpers.php";
 require_once "../../src/functions/user.php";
+require_once "../../src/components/layout.php";
 
 set_csrf_token();
 
+// handle sign up
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    check_csrf_token();
+    $valid = check_csrf_token();
+    if (!$valid) {
+        echo "Invalid CSRF token.";
+        exit();
+    }
 
-    $user_name = strtolower(trim($_POST['user_name'] ?? ''));
+    $user_name = sanitize_user_name($_POST['user_name'] ?? '');
     $password = $_POST['password'] ?? '';
 
     $user_name_validation = validate_user_name($user_name);
@@ -27,17 +33,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
-    $user_exists = exists_user($conn, $user_name);
+    $user_exists = user_name_exists($conn, $user_name);
     if ($user_exists) {
-        echo "User already exists.";
+        echo "User name already exists.";
         exit();
     }
 
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-    if (add_user($conn, $user_name, $hashed_password)) {
+    $user_id = add_user($conn, $user_name, $hashed_password);
+    if ($user_id) {
         session_regenerate_id(true);
-        
-        $_SESSION['user_name'] = $user_name;
+
+        $_SESSION['user_id'] = $user_id;
         redirect('../app/index.php');
     } else {
         echo "Error creating user.";
@@ -47,21 +54,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign-up</title>
-</head>
-<body>
+<?php render_header("sign up"); ?>
+
 <form method="POST">
     <input type="text" name="user_name">
     <input type="password" name="password">
     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-    <input type="submit" value="Sign up">
+    <input type="submit" value="sign up">
 </form>    
-<a href="log-in.php">Log in</a>  
-</body>
-</html>
+<a href="log-in.php">log in</a>  
+
+<?php render_footer(); ?>
 

@@ -1,4 +1,6 @@
 <?php
+
+// Validation functions
 function validate_user_name($user_name) {
     if (empty($user_name)) {
         return "Username is required.";
@@ -36,4 +38,28 @@ function validate_password($password) {
     }
     return true;
 }
+
+function validate_post_content($content) {
+    if (empty($content)) {
+        return "Post content cannot be empty.";
+    }
+    if (strlen($content) > 280) {
+        return "Post content cannot exceed 280 characters.";
+    }
+    return true;
+}
+
+// Sanitization functions
+function sanitize_input($input) {
+    return htmlspecialchars(trim($input));
+}
+
+function sanitize_post_content($content) {
+    return sanitize_input($content);
+}
+
+function sanitize_user_name($user_name) {
+    return strtolower(sanitize_input($user_name));
+}
+
 ?>
