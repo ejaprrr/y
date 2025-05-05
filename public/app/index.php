@@ -1,20 +1,31 @@
 <?php
 
-session_start();
 require_once "../../src/functions/connection.php";
 require_once "../../src/functions/helpers.php";
+require_once "../../src/functions/auth.php";
 require_once "../../src/functions/post.php";
 require_once "../../src/functions/validation.php";
 require_once "../../src/functions/user.php";
 require_once "../../src/components/post.php";
 require_once "../../src/components/layout.php";
 
-check_login();
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-$user = get_user($conn, $_SESSION['user_id'] ?? "");
+check_login();
+set_csrf_token();
+
+$user = get_user($conn, $_SESSION['user_id']);
 
 // handle post creation
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $valid = check_csrf_token();
+    if (!$valid) {
+        echo "Invalid CSRF token.";
+        exit();
+    }
+
     $content = sanitize_post_content($_POST['content'] ?? '');
 
     $content_validation = validate_post_content($content);
@@ -45,6 +56,7 @@ $posts = get_posts($conn);
 <h2>create a post</h2>
 <form method="POST">
     <textarea name="content" placeholder="what's happening?" required></textarea>
+    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
     <input type="submit" value="post">
 </form>
 

@@ -1,12 +1,12 @@
 <?php
 
-session_start();
 require_once "../../src/functions/connection.php";
 require_once "../../src/functions/auth.php";
 require_once "../../src/functions/validation.php";
 require_once "../../src/functions/helpers.php";
 require_once "../../src/components/layout.php";
 
+start_session();
 set_csrf_token();
 
 // handle log in
@@ -23,8 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $user_id = verify_user($conn, $user_name, $password);
 
     if ($user_id) {
-        session_regenerate_id(true);
-
+        session_regenerate_id(true); // Regenerate session ID to prevent fixation
         $_SESSION['user_id'] = $user_id;
         redirect('../app/index.php');
     } else {

@@ -5,10 +5,8 @@ function user_name_exists($conn, $user_name) {
     $stmt->execute();
     $stmt->store_result();
     
-    if ($stmt->num_rows > 0) {
-        $stmt->close();
-        return true;
-    }
+    $stmt->close();
+    return $stmt->num_rows > 0;
 }
 
 function add_user($conn, $user_name, $hashed_password) {

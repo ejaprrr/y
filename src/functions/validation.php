@@ -1,5 +1,4 @@
 <?php
-
 // Validation functions
 function validate_user_name($user_name) {
     if (empty($user_name)) {

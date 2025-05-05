@@ -1,11 +1,6 @@
 <?php
-
 require_once '../../src/functions/helpers.php';
-session_start();
+start_session();
 
-session_unset(); 
-session_destroy(); 
-
-redirect('log-in.php');
-
+log_out();
 ?>
