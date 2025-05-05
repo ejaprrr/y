@@ -1,7 +1,5 @@
 <?php
-require_once __DIR__ . "/src/functions/connection.php";
-
-function exists_user($user_name) {
+function exists_user($conn, $user_name) {
     $stmt = $conn->prepare("SELECT user_name FROM users WHERE user_name = ?");
     $stmt->bind_param("s", $user_name);
     $stmt->execute();
@@ -13,7 +11,7 @@ function exists_user($user_name) {
     }
 }
 
-function add_user($user_name, $hashed_password) {
+function add_user($conn, $user_name, $hashed_password) {
     $stmt = $conn->prepare("INSERT INTO users (user_name, password) VALUES (?, ?)");
     $stmt->bind_param("ss", $user_name, $hashed_password);
     $success = $stmt->execute();
@@ -25,4 +23,5 @@ function add_user($user_name, $hashed_password) {
 
     return false;
 }
+
 ?>

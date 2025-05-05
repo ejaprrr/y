@@ -28,12 +28,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
-    $verified = verify_user($user_name, $password);
+    $verified = verify_user($conn, $user_name, $password);
 
     if ($verified) {
         session_regenerate_id(true);
         $_SESSION['user_name'] = $user_name;
-        redirect('/app/index.php');
+        redirect('../app/index.php');
     }
 }
 ?>
@@ -51,7 +51,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <input type="password" name="password">
     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
     <input type="submit" value="Log in">
-</form>    
+</form>  
+<a href="sign-up.php">Sign up</a>  
 </body>
 </html>
 

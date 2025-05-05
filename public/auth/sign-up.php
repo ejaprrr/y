@@ -1,9 +1,13 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 session_start();
 require_once "../../src/functions/connection.php";
 require_once "../../src/functions/auth.php";
 require_once "../../src/functions/validation.php";
 require_once "../../src/functions/helpers.php";
+require_once "../../src/functions/user.php";
 
 set_csrf_token();
 
@@ -25,17 +29,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
-    $user_exists = exists_user($user_name);
+    $user_exists = exists_user($conn, $user_name);
     if ($user_exists) {
         echo "User already exists.";
         exit();
     }
 
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-    if (add_user($user_name, $hashed_password)) {
+    if (add_user($conn, $user_name, $hashed_password)) {
         session_regenerate_id(true);
         $_SESSION['user_name'] = $user_name;
-        redirect('/app/index.php');
+        redirect('../app/index.php');
     } else {
         echo "Error creating user.";
         exit();
@@ -57,6 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
     <input type="submit" value="Sign up">
 </form>    
+<a href="log-in.php">Log in</a>  
 </body>
 </html>
 

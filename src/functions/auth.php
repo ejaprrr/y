@@ -13,11 +13,11 @@ function check_csrf_token() {
     }
 }
 
-function get_user_from_session() {
+function get_user_name_from_session() {
     return $_SESSION['user_name'] ?? null;
 }
 
-function verify_user($user_name, $password) {
+function verify_user($conn, $user_name, $password) {
     $stmt = $conn->prepare("SELECT password FROM users WHERE user_name = ?");
     $stmt->bind_param("s", $user_name);
     $stmt->execute();
