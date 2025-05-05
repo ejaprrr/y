@@ -1,7 +1,5 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+
 session_start();
 require_once "../../src/functions/connection.php";
 require_once "../../src/functions/auth.php";
@@ -27,11 +25,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo $password_validation;
         exit();
     }
+
     $verified = verify_user($conn, $user_name, $password);
-
     if ($verified) {
-
         session_regenerate_id(true);
+
         $_SESSION['user_name'] = $user_name;
         redirect('../app/index.php');
     } else {
@@ -39,6 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 }
+
 ?>
 
 <!DOCTYPE html>

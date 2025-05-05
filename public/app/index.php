@@ -1,32 +1,32 @@
 <?php
+
 session_start();
 require_once "../../src/functions/connection.php";
 require_once "../../src/functions/helpers.php";
 require_once "../../src/functions/post.php";
+require_once "../../src/components/post.php"; // Include the post component
 
-if (!isset($_SESSION['user_name'])) {
-    redirect("../auth/log-in.php");
-}
+check_login();
 
 $user_name = $_SESSION['user_name'];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $content = trim($_POST['content'] ?? '');
 
-    if (!empty($content)) {
-        if (add_post($conn, $user_name, $content)) {
-            redirect("index.php");
-        } else {
-            echo "Error saving post.";
-        }
-
-        $stmt->close();
-    } else {
+    if (empty($content)) {
         echo "Post content cannot be empty.";
+        exit();
+    }
+
+    if (add_post($conn, $user_name, $content)) {
+        redirect("index.php");
+    } else {
+        echo "Error saving post.";
     }
 }
 
 $posts = get_posts($conn);
+
 ?>
 
 <!DOCTYPE html>
@@ -37,8 +37,7 @@ $posts = get_posts($conn);
     <title>Welcome</title>
 </head>
 <body>
-    <h1>Welcome, <?= $user_name ?>!</h1>
-    <p>We're glad to have you here.</p>
+    <h1>Welcome, <?= htmlspecialchars($user_name) ?>!</h1>
     <a href="../auth/log-out.php">Log out</a>
 
     <h2>Create a Post</h2>
@@ -50,11 +49,7 @@ $posts = get_posts($conn);
     <h2>Recent Posts</h2>
     <?php if (!empty($posts)): ?>
         <?php foreach ($posts as $post): ?>
-            <div>
-                <p><strong><?= htmlspecialchars($post['user_name']) ?></strong> (<?= $post['created_at'] ?>):</p>
-                <p><?= nl2br(htmlspecialchars($post['content'])) ?></p>
-                <hr>
-            </div>
+            <?php render_post($post['user_name'], $post['content'], $post['created_at']); ?>
         <?php endforeach; ?>
     <?php else: ?>
         <p>No posts yet. Be the first to post!</p>
