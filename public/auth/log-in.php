@@ -27,13 +27,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo $password_validation;
         exit();
     }
-
     $verified = verify_user($conn, $user_name, $password);
 
     if ($verified) {
+
         session_regenerate_id(true);
         $_SESSION['user_name'] = $user_name;
         redirect('../app/index.php');
+    } else {
+        echo "Invalid username or password.";
+        exit();
     }
 }
 ?>

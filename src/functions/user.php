@@ -12,7 +12,7 @@ function exists_user($conn, $user_name) {
 }
 
 function add_user($conn, $user_name, $hashed_password) {
-    $stmt = $conn->prepare("INSERT INTO users (user_name, password) VALUES (?, ?)");
+    $stmt = $conn->prepare("INSERT INTO users (user_name, password_hash) VALUES (?, ?)");
     $stmt->bind_param("ss", $user_name, $hashed_password);
     $success = $stmt->execute();
     $stmt->close();

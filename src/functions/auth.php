@@ -18,18 +18,19 @@ function get_user_name_from_session() {
 }
 
 function verify_user($conn, $user_name, $password) {
-    $stmt = $conn->prepare("SELECT password FROM users WHERE user_name = ?");
+    $stmt = $conn->prepare("SELECT password_hash FROM users WHERE user_name = ?");
     $stmt->bind_param("s", $user_name);
     $stmt->execute();
-    $stmt->store_result();
-    if ($stmt->num_rows > 0) {
-        $stmt->bind_result($hashed_password);
-        $stmt->fetch();
-
+    $result = $stmt->get_result();
+    
+    if ($row = $result->fetch_assoc()) {
+        $hashed_password = $row['password_hash'];
+        $stmt->close();
         return password_verify($password, $hashed_password);
     }
-
+    
     $stmt->close();
+    return false;
 }
 
 ?>

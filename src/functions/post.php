@@ -1,0 +1,39 @@
+<?php
+function add_post($conn, $user_name, $content) {
+    // First get the user_id from the user_name
+    $user_stmt = $conn->prepare("SELECT id FROM users WHERE user_name = ?");
+    $user_stmt->bind_param("s", $user_name);
+    $user_stmt->execute();
+    $user_result = $user_stmt->get_result();
+    
+    if ($user_row = $user_result->fetch_assoc()) {
+        $user_id = $user_row['id'];
+        
+        // Now insert the post with user_id
+        $stmt = $conn->prepare("INSERT INTO posts (user_id, content) VALUES (?, ?)");
+        $stmt->bind_param("is", $user_id, $content);
+        $success = $stmt->execute();
+        $stmt->close();
+
+        if ($success) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function get_posts($conn) {
+    // Join with users table to get user_name
+    $stmt = $conn->prepare("SELECT u.user_name, p.content, p.created_at 
+                           FROM posts p 
+                           JOIN users u ON p.user_id = u.id 
+                           ORDER BY p.created_at DESC");
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $posts = $result->fetch_all(MYSQLI_ASSOC);
+
+    $stmt->close();
+    return $posts;
+}
+?>
