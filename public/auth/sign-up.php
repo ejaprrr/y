@@ -204,39 +204,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </style>
 
 <div class="auth-page">
-    <!-- Left sidebar with logo -->
+    <!-- left sidebar with logo -->
     <div class="sidebar">
         <img src="../assets/logo.svg" alt="Logo" class="logo-svg">
     </div>
 
-    <!-- Right content area with form -->
+    <!-- right content area with form -->
     <div class="content-area">
-        <div class="form-wrapper">
-            <div class="card shadow">
-                <div class="card-header">
-                    <h3 class="text-center m-0">Sign Up</h3>
-                </div>
-                <div class="card-body">
-                    <form method="POST">
-                        <div class="mb-4">
-                            <label for="user_name" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="user_name" name="user_name" placeholder="Enter your username" required>
-                        </div>
-                        <div class="mb-4">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter a strong password" required>
-                        </div>
-                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-                        <div class="d-grid mt-4">
-                            <button type="submit" class="btn btn-primary">Sign Up</button>
-                        </div>
-                    </form>
-                </div>
-                <div class="card-footer text-center">
-                    <small>Already have an account? 
-                        <a href="log-in.php">Log in</a>
-                    </small>
-                </div>
+        <div class="card form-wrapper">
+            <div class="card-header">
+                <h3 class="text-center m-0">sign up</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-4">
+                        <label for="user_name" class="form-label">username</label>
+                        <input type="text" class="form-control" id="user_name" name="user_name" placeholder="enter your username" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="password" class="form-label">password</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="enter a strong password" required>
+                    </div>
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary">sign up</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center">
+                <small>already have an account? 
+                    <a href="log-in.php">log in</a>
+                </small>
             </div>
         </div>
     </div>
