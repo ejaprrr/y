@@ -9,9 +9,7 @@ function redirect($path) {
 
 function check_login() {
     start_session();
-    if (!isset($_SESSION['user_id'])) {
-        redirect('../auth/log-in.php');
-    }
+    return isset($_SESSION['user_id']);
 }
 
 function log_out() {
@@ -19,6 +17,10 @@ function log_out() {
     session_destroy(); 
 
     redirect('../auth/log-in.php');
+}
+
+function set_endpoint_header() {
+    header('Content-Type: application/json');
 }
 
 function start_session() {

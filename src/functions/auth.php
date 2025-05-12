@@ -15,11 +15,7 @@ function check_csrf_token() {
     if (empty($_SESSION['csrf_token'])) {
         return false;
     }
-    $is_valid = hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '');
-    if ($is_valid) {
-        regenerate_csrf_token(); // Regenerate token after successful validation
-    }
-    return $is_valid;
+    return hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '');
 }
 
 function get_user_id_from_session() {

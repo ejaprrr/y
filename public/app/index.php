@@ -1,4 +1,8 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 
 require_once "../../src/functions/connection.php";
 require_once "../../src/functions/helpers.php";
@@ -9,11 +13,10 @@ require_once "../../src/functions/user.php";
 require_once "../../src/components/post.php";
 require_once "../../src/components/layout.php";
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+if (!check_login()) {
+    redirect("../auth/log-in.php");
+}
 
-check_login();
 set_csrf_token();
 
 $user = get_user($conn, $_SESSION['user_id']);
@@ -63,10 +66,42 @@ $posts = get_posts($conn);
 <h2>recent posts</h2>
 <?php if (!empty($posts)): ?>
     <?php foreach ($posts as $post): ?>
-        <?php render_post($post['user_name'], $post['content'], $post['created_at']); ?>
+        <?php render_post($post, $_SESSION['user_id'], $conn); ?>
     <?php endforeach; ?>
 <?php else: ?>
     <p>no posts yet. be the first one!</p>
 <?php endif; ?>
+
+<script>
+// handle interactions using AJAX
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.like-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const postDiv = this.closest('.post');
+            const postId = postDiv.getAttribute('data-post-id');
+            const liked = this.getAttribute('data-liked') === '1';
+            const action = liked ? 'unlike' : 'like';
+            const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+
+            btn.disabled = true;
+            fetch('interaction.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: `post_id=${encodeURIComponent(postId)}&action=${action}&csrf_token=${encodeURIComponent(csrfToken)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.error) {
+                    this.setAttribute('data-liked', data.liked ? '1' : '0');
+                    this.textContent = (data.liked ? 'Unlike' : 'Like') + ` (${data.like_count})`;
+                }
+            })
+            .finally(() => {
+                btn.disabled = false;
+            });
+        });
+    });
+});
+</script>
 
 <?php render_footer(); ?>
