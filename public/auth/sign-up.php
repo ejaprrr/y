@@ -166,6 +166,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     .btn-primary:hover {
         background-color: var(--gray-300);
         transform: translateY(-1px);
+        color: var(--gray-800);
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
 
@@ -176,7 +177,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     a:hover {
-        color: var(--gray-100);
+        color: var(--gray-300);
     }
 
     /* Responsive design */
