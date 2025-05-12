@@ -55,13 +55,113 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <?php render_header("sign up"); ?>
 
-<form method="POST">
-    <input type="text" name="user_name">
-    <input type="password" name="password">
-    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-    <input type="submit" value="sign up">
-</form>    
-<a href="log-in.php">log in</a>  
+<style>
+    :root {
+        --background-color: #212529; /* Tmavé pozadí */
+        --text-color: #f8f9fa; /* Světlejší text */
+        --card-background: #343a40; /* Tmavší šedá pro kartu */
+        --card-header-background: #495057; /* Ještě tmavší šedá pro hlavičku */
+        --border-color: #6c757d; /* Jemný šedý okraj */
+        --focus-border-color: #adb5bd; /* Světlejší šedá při focusu */
+        --button-background: #e9ecef; /* Světle šedé pozadí pro tlačítko */
+        --button-text-color: #212529; /* Tmavý text pro tlačítko */
+        --button-hover-background: #dee2e6; /* Světlejší šedé pozadí při hoveru */
+        --link-color: #adb5bd; /* Světlejší šedá pro odkazy */
+        --link-hover-color: #f8f9fa; /* Bílá při hoveru */
+    }
+
+    body {
+        background-color: var(--background-color);
+        color: var(--text-color);
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0;
+    }
+    .card {
+        background-color: var(--card-background);
+        border: none;
+        color: var(--text-color);
+    }
+    .card-header {
+        background-color: var(--card-header-background);
+        border-bottom: 1px solid var(--border-color);
+    }
+    .form-control {
+        background-color: var(--card-header-background);
+        color: var(--text-color);
+        border: 1px solid var(--border-color);
+    }
+    .form-control::placeholder {
+        color: var(--link-color); /* Světlejší šedá pro placeholder text */
+    }
+    .form-control:focus {
+        background-color: var(--card-header-background);
+        color: var(--text-color);
+        border-color: var(--focus-border-color);
+        box-shadow: none;
+    }
+    .btn-primary {
+        background-color: var(--button-background);
+        color: var(--button-text-color);
+        border: none;
+    }
+    .btn-primary:hover {
+        background-color: var(--button-hover-background);
+        color: var(--button-text-color);
+    }
+    a {
+        color: var(--link-color);
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+    a:hover {
+        color: var(--link-hover-color);
+        text-decoration: underline;
+    }
+    .logo {
+        display: block;
+        margin: 0 auto 20px auto; /* Centrované logo s mezerou pod ním */
+        max-width: 150px;
+    }
+    .full-height {
+        height: 100vh; /* Výška celé obrazovky */
+    }
+</style>
+
+<div class="container full-height d-flex flex-column justify-content-center align-items-center">
+    <!-- Logo umístěné nad kartou -->
+    <img src="../assets/logo.png" alt="Logo" class="logo">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header text-center">
+                <h3>Sign Up</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="user_name" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="user_name" name="user_name" placeholder="Enter your username (e.g., johndoe)" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter a strong password" required>
+                    </div>
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Sign Up</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center">
+                <small>Already have an account? 
+                    <a href="log-in.php" class="text-decoration-none">Log in</a>
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
 
 <?php render_footer(); ?>
 
