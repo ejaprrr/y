@@ -22,9 +22,9 @@ function get_user_id_from_session() {
     return $_SESSION['user_id'] ?? null;
 }
 
-function verify_user($conn, $user_name, $password) {
-    $stmt = $conn->prepare("SELECT id, password_hash FROM users WHERE user_name = ?");
-    $stmt->bind_param("s", $user_name);
+function verify_user($conn, $username, $password) {
+    $stmt = $conn->prepare("SELECT id, password_hash FROM users WHERE username = ?");
+    $stmt->bind_param("s", $username);
     $stmt->execute();
     $result = $stmt->get_result();
     
@@ -37,7 +37,6 @@ function verify_user($conn, $user_name, $password) {
         }
     }
     
-    $stmt->close();
     return false;
 }
 

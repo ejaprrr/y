@@ -37,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit();
     }
 
-    $success = add_post($conn, $user["user_name"], $content);
+    $success = add_post($conn, $user["username"], $content);
 
     if ($success) {
         redirect("index.php");
@@ -53,7 +53,7 @@ $posts = get_posts($conn);
 
 <?php render_header("feed"); ?>
 
-<h1>welcome, <?= $user["user_name"] ?>!</h1>
+<h1>welcome, <?= $user["username"] ?>!</h1>
 <a href="../auth/log-out.php">log out</a>
 
 <h2>create a post</h2>

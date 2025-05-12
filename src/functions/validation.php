@@ -1,16 +1,16 @@
 <?php
 // Validation functions
-function validate_user_name($user_name) {
-    if (empty($user_name)) {
+function validate_username($username) {
+    if (empty($username)) {
         return "Username is required.";
     }
-    if (strlen($user_name) < 3 || strlen($user_name) > 24) {
+    if (strlen($username) < 3 || strlen($username) > 24) {
         return "Username must be between 3 and 24 characters.";
     }
-    if (!preg_match('/^[a-z0-9_]+$/', $user_name)) {
+    if (!preg_match('/^[a-z0-9_]+$/', $username)) {
         return "Username can only contain lowercase letters, numbers, and underscores.";
     }
-    if ($user_name[0] === '_') {
+    if ($username[0] === '_') {
         return "Username cannot start with an underscore.";
     }
     return true;
@@ -57,8 +57,8 @@ function sanitize_post_content($content) {
     return sanitize_input($content);
 }
 
-function sanitize_user_name($user_name) {
-    return strtolower(sanitize_input($user_name));
+function sanitize_username($username) {
+    return strtolower(sanitize_input($username));
 }
 
 ?>

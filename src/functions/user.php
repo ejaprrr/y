@@ -1,7 +1,7 @@
 <?php
-function user_name_exists($conn, $user_name) {
-    $stmt = $conn->prepare("SELECT user_name FROM users WHERE user_name = ?");
-    $stmt->bind_param("s", $user_name);
+function username_exists($conn, $username) {
+    $stmt = $conn->prepare("SELECT username FROM users WHERE username = ?");
+    $stmt->bind_param("s", $username);
     $stmt->execute();
     $stmt->store_result();
     $exists = $stmt->num_rows > 0;
@@ -9,9 +9,9 @@ function user_name_exists($conn, $user_name) {
     return $exists;
 }
 
-function add_user($conn, $user_name, $hashed_password) {
-    $stmt = $conn->prepare("INSERT INTO users (user_name, password_hash) VALUES (?, ?)");
-    $stmt->bind_param("ss", $user_name, $hashed_password);
+function add_user($conn, $username, $hashed_password) {
+    $stmt = $conn->prepare("INSERT INTO users (username, password_hash) VALUES (?, ?)");
+    $stmt->bind_param("ss", $username, $hashed_password);
 
     if ($stmt->execute()) {
         $new_id = $conn->insert_id;
@@ -24,7 +24,7 @@ function add_user($conn, $user_name, $hashed_password) {
 }
 
 function get_user($conn, $user_id) {
-    $stmt = $conn->prepare("SELECT user_name FROM users WHERE id = ?");
+    $stmt = $conn->prepare("SELECT username FROM users WHERE id = ?");
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
     $result = $stmt->get_result();

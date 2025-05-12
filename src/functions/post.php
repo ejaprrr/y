@@ -11,10 +11,10 @@ function post_exists($conn, $id) {
     return $exists;
 }
 
-function add_post($conn, $user_name, $content) {
-    // First get the user_id from the user_name
-    $user_stmt = $conn->prepare("SELECT id FROM users WHERE user_name = ?");
-    $user_stmt->bind_param("s", $user_name);
+function add_post($conn, $username, $content) {
+    // First get the user_id from the username
+    $user_stmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
+    $user_stmt->bind_param("s", $username);
     $user_stmt->execute();
     $user_result = $user_stmt->get_result();
     
@@ -36,7 +36,7 @@ function add_post($conn, $user_name, $content) {
 }
 
 function get_posts($conn) {
-    $stmt = $conn->prepare("SELECT p.id, u.user_name, p.content, p.created_at 
+    $stmt = $conn->prepare("SELECT p.id, u.username, p.content, p.created_at 
                            FROM posts p 
                            JOIN users u ON p.user_id = u.id 
                            ORDER BY p.created_at DESC");
