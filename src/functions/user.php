@@ -4,9 +4,9 @@ function user_name_exists($conn, $user_name) {
     $stmt->bind_param("s", $user_name);
     $stmt->execute();
     $stmt->store_result();
-    
+    $exists = $stmt->num_rows > 0;
     $stmt->close();
-    return $stmt->num_rows > 0;
+    return $exists;
 }
 
 function add_user($conn, $user_name, $hashed_password) {
