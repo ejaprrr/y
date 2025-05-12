@@ -1,0 +1,21 @@
+/* Composer Component */
+.composer .card {
+  border: 1px solid var(--gray-700) !important;
+}
+
+.composer textarea {
+  background-color: transparent !important;
+  border: none;
+  color: var(--gray-100);
+  resize: none;
+  height: 100px;
+}
+
+.composer textarea:focus {
+  box-shadow: none;
+  outline: none;
+}
+
+.composer .btn-primary {
+  min-width: 80px;
+}

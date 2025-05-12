@@ -1,0 +1,21 @@
+/* Right Sidebar Component */
+.right-sidebar {
+  width: 30%;
+  flex: 0 0 30%;
+  background: linear-gradient(180deg, var(--gray-900), var(--gray-800));
+  overflow-y: auto;
+  height: 100vh;
+}
+
+/* Trend items */
+.right-sidebar .card {
+  border: none;
+}
+
+.right-sidebar .fw-bold {
+  color: var(--gray-100);
+}
+
+.right-sidebar small {
+  color: var(--gray-400);
+}

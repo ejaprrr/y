@@ -9,6 +9,7 @@ require_once "../../src/components/post.php";
 require_once "../../src/components/layout.php";
 require_once "../../src/components/app/left-sidebar.php";
 require_once "../../src/components/app/right-sidebar.php";
+require_once "../../src/components/app/composer.php";
 
 // Authentication check
 if (!check_login()) {
@@ -50,33 +51,24 @@ $posts = get_posts($conn);
 
 <link rel="stylesheet" href="../assets/css/pages/app.css">
 <link rel="stylesheet" href="../assets/css/components/post.css">
+<link rel="stylesheet" href="../assets/css/components/left-sidebar.css">
+<link rel="stylesheet" href="../assets/css/components/right-sidebar.css">
+<link rel="stylesheet" href="../assets/css/components/composer.css">
 
 <div class="app-container d-flex vh-100">
     <?php render_left_sidebar($user); ?>
 
-    <!-- Main Feed -->
     <div class="main-content">
-        <!-- Post Form -->
-        <div class="card rounded-4 mx-3 my-3">
-            <div class="card-body p-3">
-                <form method="POST">
-                    <textarea name="content" placeholder="what's happening?" class="form-control bg-transparent text-white border-0 mb-3 text-lowercase" style="height: 100px; resize: none;" required></textarea>
-                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-                    <div class="d-flex justify-content-end">
-                        <button type="submit" class="btn btn-primary rounded-3 px-4 text-lowercase fw-semibold">post</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+        <?php render_composer(); ?>
+        
 
-        <!-- Posts -->
         <div class="posts mx-3">
             <?php if (!empty($posts)): ?>
                 <?php foreach ($posts as $post): ?>
                     <?php render_post($post, $conn); ?> 
                 <?php endforeach; ?>
             <?php else: ?>
-                <p class="text-center text-muted my-5 text-lowercase">no posts yet. be the first one!</p>
+                <p class="text-center my-5 text-lowercase">no posts yet. be the first one!</p>
             <?php endif; ?>
         </div>
     </div>
