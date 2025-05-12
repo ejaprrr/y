@@ -1,0 +1,24 @@
+.content-area {
+  flex: 1;
+}
+
+.form-wrapper {
+  max-width: 650px;
+}
+
+.card-header {
+  background-color: var(--gray-800);
+  border-bottom: 1px solid var(--gray-500);
+  background: linear-gradient(-45deg, var(--gray-800), var(--gray-600));
+}
+
+.card-header h3 {
+  font-size: 1.75rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.card-header span {
+  font-size: 1rem;
+  color: var(--gray-400);
+}

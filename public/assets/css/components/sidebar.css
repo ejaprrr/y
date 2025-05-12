@@ -1,0 +1,14 @@
+.sidebar {
+  background-color: var(--gray-800);
+  background: linear-gradient(180deg, var(--gray-900), var(--gray-800));
+  color: #ffffff;
+  width: 25%;
+}
+
+.logo-svg {
+  max-width: 200px;
+}
+
+.links-wrapper * {
+  color: var(--gray-500);
+}

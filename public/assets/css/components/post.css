@@ -1,0 +1,32 @@
+.post {
+  margin-bottom: 1rem;
+}
+
+.like-btn {
+  background: none;
+  border: none;
+  color: var(--gray-300);
+  cursor: pointer;
+  transition: color 0.2s ease;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.like-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--gray-200);
+}
+
+.like-btn i {
+  font-size: 1.2rem;
+}
+
+.bi-heart {
+  color: var(--gray-200);
+}
+
+.like-count {
+  color: var(--gray-300);
+  margin-left: 0.5rem;
+  font-weight: 500;
+}

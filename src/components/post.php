@@ -2,21 +2,29 @@
 
 require_once '../../src/functions/like.php';
 
-function render_post($post, $current_user_id, $conn) {
-    $username = $post['username'];
-    $content = $post['content'];
-    $created_at = $post['created_at'];
-    $post_id = $post['id'];
-    $like_count = get_like_count($conn, $post_id);
-    $liked = has_liked($conn, $current_user_id, $post_id);
+function render_post($post, $conn) {
 ?>
-<div class="post" data-post-id="<?= $post_id ?>">
-    <p><strong><?= $username ?></strong> (<?= $created_at ?>):</p>
-    <p><?= nl2br(htmlspecialchars($content)) ?></p>
-    <button class="like-btn" data-liked="<?= $liked ? '1' : '0' ?>">
-        <?= $liked ? 'Unlike' : 'Like' ?> (<?= $like_count ?>)
-    </button>
-    <hr>
+<div class="card mb-3 rounded-4" data-post-id="<?= $post['id'] ?>">
+<div class="card-body p-3">
+    <div class="d-flex mb-2">
+        <div class="rounded-circle bg-light me-2" style="width: 40px; height: 40px; overflow: hidden;"></div>
+        <div>
+            <div class="fw-bold text-lowercase"><?= htmlspecialchars($post['username']) ?></div>
+            <small>
+                @<?= htmlspecialchars($post['username']) ?> · <span class="date-text"><?= date('M d, Y', strtotime($post['created_at'])) ?></span>
+            </small>
+        </div>
+    </div>
+    <div class="mb-3">
+        <?= nl2br(htmlspecialchars($post['content'])) ?>
+    </div>
+    <div class="d-flex align-items-center">
+        <button class="like-btn hover-highlight d-flex align-items-center" data-liked="<?= has_liked($conn, $_SESSION['user_id'], $post['id']) ? '1' : '0' ?>">
+            <i class="bi <?= has_liked($conn, $_SESSION['user_id'], $post['id']) ? 'bi-heart-fill text-danger' : 'bi-heart' ?>"></i>
+            <span class="like-count"><?= get_like_count($conn, $post['id']) ?></span>
+        </button>
+    </div>
+</div>
 </div>
 <?php
 }

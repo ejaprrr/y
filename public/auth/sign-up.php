@@ -58,7 +58,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <?php render_header("sign up"); ?>
 
-<link rel="stylesheet" href="../assets/css/sign-up.css">
+<link rel="stylesheet" href="../assets/css/pages/auth.css">
+<link rel="stylesheet" href="../assets/css/components/container.css">
+<link rel="stylesheet" href="../assets/css/components/sidebar.css">
 
 <div class="d-flex h-100">
     <?php render_sidebar(); ?>
