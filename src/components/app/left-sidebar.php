@@ -11,7 +11,7 @@ function render_left_sidebar($user) {
     <nav class="mb-4 px-3">
         <div class="d-flex flex-column gap-3">
             <div>
-                <a href="index.php" class="d-flex align-items-center text-decoration-none text-white fs-5 py-2 px-3 rounded-3 hover-highlight active">
+                <a href="index.php" class="d-flex align-items-center text-decoration-none text-white fs-5 py-2 px-3 rounded-3 hover-highlight <?= basename($_SERVER['PHP_SELF']) === 'index.php' ? 'active' : '' ?>">
                     <i class="bi bi-house-fill me-3"></i>
                     feed
                 </a>
@@ -23,7 +23,7 @@ function render_left_sidebar($user) {
                 </a>
             </div>
             <div>
-                <a href="#" class="d-flex align-items-center text-decoration-none text-white fs-5 py-2 px-3 rounded-3 hover-highlight">
+                <a href="profile.php" class="d-flex align-items-center text-decoration-none text-white fs-5 py-2 px-3 rounded-3 hover-highlight <?= basename($_SERVER['PHP_SELF']) === 'profile.php' || basename($_SERVER['PHP_SELF']) === 'edit-profile.php' ? 'active' : '' ?>">
                     <i class="bi bi-person-fill me-3"></i>
                     profile
                 </a>
@@ -45,7 +45,15 @@ function render_left_sidebar($user) {
     <!-- User Profile -->
     <div class="mt-auto p-3">
         <div class="d-flex align-items-center p-3 rounded-3" style="background-color: var(--gray-800);">
-            <div class="rounded-circle bg-light me-2" style="width: 40px; height: 40px; overflow: hidden;"></div>
+            <div class="rounded-circle me-2" style="width: 40px; height: 40px; overflow: hidden;">
+                <?php if ($user['profile_picture']): ?>
+                    <img src="<?= htmlspecialchars($user['profile_picture']) ?>" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+                <?php else: ?>
+                    <div class="bg-light w-100 h-100 d-flex align-items-center justify-content-center">
+                        <i class="bi bi-person-fill text-dark"></i>
+                    </div>
+                <?php endif; ?>
+            </div>
             <div>
                 <div class="fw-bold text-lowercase"><?= htmlspecialchars($user["display_name"] ?? $user["username"]) ?></div>
                 <small>@<?= htmlspecialchars($user["username"]) ?></small>
