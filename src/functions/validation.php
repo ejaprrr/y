@@ -42,8 +42,8 @@ function validate_post_content($content) {
     if (empty($content)) {
         return "Post content cannot be empty.";
     }
-    if (strlen($content) > 280) {
-        return "Post content cannot exceed 280 characters.";
+    if (strlen($content) > 256) {
+        return "Post content cannot exceed 256 characters.";
     }
     return true;
 }

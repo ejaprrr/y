@@ -18,24 +18,26 @@
   margin: 0 auto;
 }
 
+.left-sidebar nav a {
+  color: var(--gray-200) !important;
+}
+
 /* Navigation styles */
 .left-sidebar .active {
   background-color: var(--gray-700);
-  font-weight: bold;
 }
 
 .left-sidebar .hover-highlight:hover {
   background-color: var(--gray-700);
-  transition: background-color 0.2s;
+  transition: background-color 0.25s;
 }
 
 /* Logout button */
 .logout-link {
   color: var(--gray-200) !important;
-  transition: color 0.2s ease;
-  font-size: 1.25rem;
+  transition: color 0.25s ease;
 }
 
 .logout-link:hover {
-  color: var(--gray-100) !important;
+  color: var(--gray-400) !important;
 }

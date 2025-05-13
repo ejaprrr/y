@@ -1,7 +1,7 @@
 <?php
 
-function render_profile_header($title, $subtitle = '', $back_url = 'index.php', $tabs = [], $is_sticky = true) {
-    $header_class = $is_sticky ? 'profile-sticky-header' : '';
+function render_page_header($title, $subtitle = '', $back_url = 'index.php', $tabs = [], $is_sticky = true) {
+    $header_class = $is_sticky ? 'sticky-header' : '';
 ?>
     <div class="<?= $header_class ?>">
         <div class="profile-header-bar d-flex align-items-center p-3 border-bottom" style="border-color: var(--gray-700) !important;">
@@ -17,7 +17,7 @@ function render_profile_header($title, $subtitle = '', $back_url = 'index.php', 
         </div>
         
         <?php if (!empty($tabs)): ?>
-            <div class="profile-modern-tabs">
+            <div class="tabs">
                 <?php foreach ($tabs as $tab): ?>
                     <a href="<?= htmlspecialchars($tab['url']) ?>" 
                        class="tab <?= $tab['active'] ? 'active' : '' ?>">

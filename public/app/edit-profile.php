@@ -8,94 +8,98 @@ require_once "../../src/functions/validation.php";
 require_once "../../src/components/layout.php";
 require_once "../../src/components/app/left-sidebar.php";
 require_once "../../src/components/app/right-sidebar.php";
-require_once "../../src/components/app/profile-header.php";
+require_once "../../src/components/app/page-header.php";
 
-// Authentication check
+// authentication check
 if (!check_login()) {
     redirect("../auth/log-in.php");
 }
 
-// Create upload directories if they don't exist
+// upload base directory
 $upload_base = realpath(__DIR__ . "/../uploads");
-if (!file_exists($upload_base)) {
-    mkdir($upload_base, 0777, true);
-}
-if (!file_exists($upload_base . "/profile")) {
-    mkdir($upload_base . "/profile", 0777, true);
-}
-if (!file_exists($upload_base . "/cover")) {
-    mkdir($upload_base . "/cover", 0777, true);
-}
 
+// set CSRF token
 set_csrf_token();
+
+// get user information
 $user = get_user($conn, $_SESSION['user_id']);
 
+// initialize variables
 $message = '';
 $error = '';
 
-// Handle form submission
+// handle form submission
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    // check CSRF token
     $valid = check_csrf_token();
     if (!$valid) {
-        $error = "Invalid CSRF token.";
+        $error = "invalid CSRF token";
     } else {
+        // sanitize and validate inputs
         $display_name = sanitize_input($_POST['display_name'] ?? '');
         $bio = sanitize_input($_POST['bio'] ?? '');
         
-        // Basic validation
-        if (strlen($display_name) > 50) {
-            $error = "Display name is too long (maximum 50 characters).";
-        } elseif (strlen($bio) > 160) {
-            $error = "Bio is too long (maximum 160 characters).";
+        // basic validation
+        if (strlen($display_name) > 24) {
+            $error = "display name is too long (maximum 24 characters)";
+        } elseif (strlen($bio) > 128) {
+            $error = "bio is too long (maximum 128 characters)";
         } else {
-            // Update profile info
+            // update profile info
             $success = update_user_profile($conn, $_SESSION['user_id'], $display_name, $bio);
             
-            // Handle profile picture upload
+            // handle profile picture upload
             if (!empty($_FILES['profile_picture']['name'])) {
-                $validation = validate_image($_FILES['profile_picture']);
-                if ($validation === true) {
-                    // Create simpler filenames
+                // validate the image
+                $valid = validate_image($_FILES['profile_picture']);
+                if ($valid) {
+                    // create simpler file names
                     $filename = 'profile_' . $_SESSION['user_id'] . '_' . time() . '.' . 
                                 pathinfo($_FILES['profile_picture']['name'], PATHINFO_EXTENSION);
                     
+                    // create target path
                     $target_path = $upload_base . "/profile/" . $filename;
                     
+                    // move the uploaded file
                     if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $target_path)) {
                         $profile_path = "/y/public/uploads/profile/" . $filename;
                         update_profile_picture($conn, $_SESSION['user_id'], $profile_path);
                     } else {
-                        $error = "Failed to upload profile picture. Check file permissions.";
+                        $error = "failed to upload profile picture";
                     }
                 } else {
-                    $error = $validation;
+                    $error = $valid;
                 }
             }
             
-            // Handle cover image upload
+            // handle cover image upload
             if (!empty($_FILES['cover_image']['name'])) {
-                $validation = validate_image($_FILES['cover_image']);
-                if ($validation === true) {
-                    // Create simpler filenames
+                $valid = validate_image($_FILES['cover_image']);
+                
+                if ($valid) {
+                    // create simpler filenames
                     $filename = 'cover_' . $_SESSION['user_id'] . '_' . time() . '.' . 
                                pathinfo($_FILES['cover_image']['name'], PATHINFO_EXTENSION);
                     
+                    // create target path
                     $target_path = $upload_base . "/cover/" . $filename;
                     
+                    // move the uploaded file
                     if (move_uploaded_file($_FILES['cover_image']['tmp_name'], $target_path)) {
                         $cover_path = "/y/public/uploads/cover/" . $filename;
                         update_cover_image($conn, $_SESSION['user_id'], $cover_path);
                     } else {
-                        $error = "Failed to upload cover image. Check file permissions.";
+                        $error = "failed to upload cover image";
                     }
                 } else {
-                    $error = $validation;
+                    $error = $valid;
                 }
             }
             
             if (empty($error)) {
-                $message = "Profile updated successfully.";
-                // Refresh user data
+                $message = "profile updated successfully";
+                
+                // refresh user data
                 $user = get_user($conn, $_SESSION['user_id']);
             }
         }
@@ -104,28 +108,29 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 ?>
 
-<?php render_header("Edit Profile"); ?>
+<?php render_header("edit profile"); ?>
 
 <link rel="stylesheet" href="../assets/css/pages/app.css">
-<link rel="stylesheet" href="../assets/css/pages/profile.css">
+<link rel="stylesheet" href="../assets/css/pages/edit-profile.css">
 <link rel="stylesheet" href="../assets/css/components/left-sidebar.css">
 <link rel="stylesheet" href="../assets/css/components/right-sidebar.css">
 
-<div class="app-container d-flex vh-100">
+<div class="d-flex">
     <?php render_left_sidebar($user); ?>
 
     <div class="main-content">
         <?php
-        // Render the profile header component with no tabs
-        render_profile_header(
-            'Edit profile',
-            '', // No subtitle
-            'profile.php', // Back link goes to profile page
-            [], // No tabs
-            false // Not sticky
+        // render the profile header component with no tabs
+        render_page_header(
+            'edit profile',
+            'customize your appearance!',
+            $_GET["origin"] ?? 'profile.php',
+            [], 
+            false
         );
         ?>
 
+        <!-- messages and errors -->
         <?php if (!empty($message)): ?>
             <div class="alert alert-success m-3"><?= $message ?></div>
         <?php endif; ?>
@@ -134,11 +139,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <div class="alert alert-danger m-3"><?= $error ?></div>
         <?php endif; ?>
 
+        <!-- edit profile form -->
         <div class="edit-profile-container p-0">
             <form method="POST" enctype="multipart/form-data">
-                <!-- Profile Preview Section -->
+                <!-- profile preview section -->
                 <div class="profile-header-preview">
-                    <!-- Cover Image -->
+                    <!-- cover image -->
                     <div class="cover-container position-relative">
                         <div class="cover-image-preview" id="cover-preview" 
                             <?php if ($user['cover_image']): ?>
@@ -152,7 +158,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         </div>
                     </div>
                     
-                    <!-- Profile Picture -->
+                    <!-- profile picture -->
                     <div class="profile-picture-edit">
                         <div class="profile-picture-container-edit">
                             <?php if ($user['profile_picture']): ?>
@@ -171,34 +177,35 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     </div>
                 </div>
 
-                <!-- Hidden file inputs -->
+                <!-- hidden file inputs -->
                 <input type="file" id="profile_picture" name="profile_picture" class="d-none" accept="image/*">
                 <input type="file" id="cover_image" name="cover_image" class="d-none" accept="image/*">
                 
-                <!-- Form Fields -->
+                <!-- form fields -->
                 <div class="profile-form-fields px-3 pt-5 pb-3">
                     <div class="mb-3">
-                        <label for="display_name" class="form-label fw-bold">Display Name</label>
+                        <label for="display_name" class="form-label fw-bold">display name</label>
                         <input type="text" class="form-control rounded-3" id="display_name" name="display_name" 
                                value="<?= htmlspecialchars($user['display_name'] ?? $user['username']) ?>" 
-                               maxlength="50">
+                               maxlength="24" required>
                         <div>your name as displayed on your profile (24 characters max)</div>
                     </div>
                     
-                    <div class="mb-4">
-                        <label for="bio" class="form-label fw-bold">Bio</label>
-                        <textarea class="form-control rounded-3" id="bio" name="bio" rows="3" maxlength="160"><?= htmlspecialchars($user['bio'] ?? '') ?></textarea>
+                    <div class="mb-3">
+                        <label for="bio" class="form-label fw-bold">bio</label>
+                        <textarea class="form-control rounded-3" id="bio" name="bio" rows="3" maxlength="128"><?= htmlspecialchars($user['bio'] ?? '') ?></textarea>
                         <div class="d-flex justify-content-between align-items-center mt-1">
                             <span>tell the world about yourself</span>
-                            <span id="bio-counter" ><?= strlen($user['bio'] ?? '') ?>/160</span>
+                            <span id="bio-counter"><?= strlen($user['bio'] ?? '') ?>/128</span>
                         </div>
                     </div>
                     
+                    <!-- CSRF token -->
                     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
                     
                     <div class="d-flex justify-content-between mt-4 pt-2 border-top" style="border-color: var(--gray-700) !important;">
-                        <a href="profile.php" class="btn btn-outline-light rounded-pill px-4">Cancel</a>
-                        <button type="submit" class="btn btn-primary rounded-pill px-4">Save Changes</button>
+                        <a href="profile.php" class="btn btn-outline-light rounded-3 px-4">cancel</a>
+                        <button type="submit" class="btn btn-primary rounded-3 px-4">save changes</button>
                     </div>
                 </div>
             </form>

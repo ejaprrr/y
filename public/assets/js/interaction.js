@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const icon = this.querySelector("i");
             const count = this.querySelector("span");
             icon.className = data.liked
-              ? "bi bi-heart-fill text-danger"
+              ? "bi bi-heart-fill liked"
               : "bi bi-heart";
             count.textContent = data.like_count;
           }

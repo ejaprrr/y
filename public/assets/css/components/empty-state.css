@@ -1,0 +1,8 @@
+.empty-state {
+  color: var(--gray-400);
+  transition: color 0.25s;
+}
+
+.empty-state:hover {
+  color: var(--gray-200);
+}

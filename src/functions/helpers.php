@@ -59,4 +59,44 @@ function start_session() {
     }
 }
 
+function format_time_ago($date_string) {
+    $timestamp = strtotime($date_string);
+    $current_time = time();
+    $diff = $current_time - $timestamp;
+    
+    // Just now
+    if ($diff < 10) {
+        return 'just now';
+    }
+    
+    // Seconds ago
+    if ($diff < 60) {
+        return $diff . 's ago';
+    }
+    
+    // Minutes ago
+    if ($diff < 3600) {
+        $minutes = floor($diff / 60);
+        return $minutes . 'm ago';
+    }
+    
+    // Hours ago
+    if ($diff < 86400) {
+        $hours = floor($diff / 3600);
+        return $hours . 'h ago';
+    }
+    
+    // Check if same year
+    $current_year = date('Y', $current_time);
+    $post_year = date('Y', $timestamp);
+    
+    if ($current_year == $post_year) {
+        // Same year - show day and month
+        return date('j M', $timestamp);
+    }
+    
+    // Different year - show day, month and year
+    return date('j M Y', $timestamp);
+}
+
 ?>

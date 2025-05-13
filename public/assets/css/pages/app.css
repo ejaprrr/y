@@ -6,7 +6,6 @@
 /* Main content column */
 .main-content {
   width: 50%;
-  flex: 0 0 50%;
   border-right: 1px solid var(--gray-700);
   overflow-y: auto;
   height: 100vh;
@@ -15,13 +14,7 @@
 /* Common hover effect used across components */
 .hover-highlight:hover {
   background-color: var(--gray-700);
-  transition: background-color 0.2s;
-}
-
-/* Date text styling */
-.date-text {
-  color: var(--gray-400) !important;
-  font-size: 0.85rem;
+  transition: background-color 0.25s;
 }
 
 /* Post cards in app */

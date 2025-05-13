@@ -24,9 +24,4 @@ function validate_image($file) {
     return true;
 }
 
-// Note: We're not using this function anymore
-// Instead, we handle uploads directly in edit-profile.php
-function upload_image($file, $type = 'profile') {
-    // For reference only, not used in the new implementation
-}
 ?>

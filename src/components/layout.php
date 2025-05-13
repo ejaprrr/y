@@ -33,6 +33,7 @@ function render_header($title) {
             --gray-200: #f0f0f0;
             --gray-100: #ffffff;
             --blue: #4895ef;
+            --red: #ff6f61;
         }
 
         body, html {

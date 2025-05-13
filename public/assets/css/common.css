@@ -87,3 +87,51 @@ a:hover {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--gray-600);
 }
+
+.cover-image {
+  height: 200px;
+}
+
+.default-cover {
+  background: linear-gradient(135deg, var(--gray-800) 0%, var(--gray-700) 100%);
+}
+
+.profile-picture-container {
+  top: -50px;
+}
+
+.avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 5px solid var(--gray-900);
+  object-fit: cover;
+  background-color: var(--gray-700);
+}
+
+.default-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* icon of default avatar for users without a profile picture */
+.default-avatar i {
+  font-size: 3rem;
+  color: var(--gray-500);
+}
+
+.profile-picture {
+  width: 40px;
+  height: 40px;
+  background-color: var(--gray-700);
+}
+
+.default-profile-picture {
+  color: var(--gray-900);
+}
+
+textarea {
+  resize: none;
+  height: 100px;
+}
