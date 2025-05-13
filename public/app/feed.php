@@ -44,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // add post
     $success = add_post($conn, $user["username"], $content);
     if ($success) {
-        redirect("index.php");
+        redirect("feed.php");
     } else {
         echo "Error saving post.";
         exit();

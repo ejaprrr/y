@@ -1,6 +1,6 @@
 <?php
 
-function render_page_header($title, $subtitle = '', $back_url = 'index.php', $tabs = [], $is_sticky = true) {
+function render_page_header($title, $subtitle = '', $back_url = 'feed.php', $tabs = [], $is_sticky = true) {
     $header_class = $is_sticky ? 'sticky-header' : '';
 ?>
     <div class="<?= $header_class ?>">

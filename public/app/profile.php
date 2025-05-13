@@ -29,7 +29,7 @@ $profile_user = get_user_by_username($conn, $username);
 
 if (!$profile_user) {
     // user not found
-    header("Location: index.php");
+    header("Location: feed.php");
     exit();
 }
 
@@ -90,7 +90,7 @@ $active_tab = isset($_GET['tab']) ? sanitize_input($_GET['tab']) : 'posts';
         render_page_header(
             $profile_user['display_name'] ?? $profile_user['username'],
             count($posts) . ' posts',
-            $_GET["origin"] ?? 'index.php',
+            $_GET["origin"] ?? 'feed.php',
             $profile_tabs
         );
         ?>

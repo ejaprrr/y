@@ -12,7 +12,7 @@ function render_left_sidebar($user) {
     <nav class="px-3">
         <div class="d-flex flex-column gap-3">
             <div>
-                <a href="index.php" class="d-flex align-items-center text-decoration-none fs-5 py-2 px-3 rounded-3 hover-highlight <?= basename($_SERVER['PHP_SELF']) === 'index.php' ? 'active' : '' ?>">
+                <a href="feed.php" class="d-flex align-items-center text-decoration-none fs-5 py-2 px-3 rounded-3 hover-highlight <?= basename($_SERVER['PHP_SELF']) === 'feed.php' ? 'active' : '' ?>">
                     <i class="bi bi-house-fill me-3"></i>
                     feed
                 </a>

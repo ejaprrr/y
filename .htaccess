@@ -1,0 +1,42 @@
+# enable URL rewriting
+RewriteEngine On
+
+# set base directory
+RewriteBase /y/
+
+# Prevent direct access to the src directory
+<IfModule mod_alias.c>
+    RedirectMatch 403 ^/y/src/.*$
+</IfModule>
+
+# block direct access to the src directory with mod_rewrite as a fallback
+RewriteRule ^src/ - [F,L]
+
+# hide public folder and restructure URLs
+# redirect root requests to about folder
+RewriteRule ^$ public/about/ [L]
+
+# handle requests for app and auth directories
+RewriteRule ^(app|auth)/(.*)$ public/$1/$2 [L]
+
+# handle requests for the about directory
+RewriteRule ^about/(.*)$ public/about/$1 [L]
+
+# handle static resources in assets
+RewriteRule ^assets/(.*)$ public/assets/$1 [L]
+
+# Hide .php extensions
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^(.*)$ $1.php [L]
+
+# Handle direct access to PHP files without extension
+RewriteCond %{THE_REQUEST} \s/+([^.]+)\.php [NC]
+RewriteRule ^ /%1 [R=301,L]
+
+# Properly handle trailing slashes for consistency
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*[^/])$ /$1/ [L,R=301]
+
+# set default index file
+DirectoryIndex index.php

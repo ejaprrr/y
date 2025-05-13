@@ -27,7 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($user_id) {
             session_regenerate_id(true);
             $_SESSION['user_id'] = $user_id;
-            redirect('../app/index.php');
+            redirect('../app/feed.php');
         } else {
             $error_message = "invalid username or password";
         }

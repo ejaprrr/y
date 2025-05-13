@@ -195,7 +195,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         <label for="bio" class="form-label fw-bold">bio</label>
                         <textarea class="form-control rounded-3" id="bio" name="bio" rows="3" maxlength="128"><?= htmlspecialchars($user['bio'] ?? '') ?></textarea>
                         <div class="d-flex justify-content-between align-items-center mt-1">
-                            <span>tell the world about yourself</span>
+                            <span>tell the world about usourself</span>
                             <span id="bio-counter"><?= strlen($user['bio'] ?? '') ?>/128</span>
                         </div>
                     </div>
