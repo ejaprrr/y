@@ -135,3 +135,7 @@ textarea {
   resize: none;
   height: 100px;
 }
+
+.links-wrapper * {
+  color: var(--gray-500);
+}

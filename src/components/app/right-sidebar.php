@@ -1,7 +1,7 @@
 <?php
 function render_right_sidebar() {
 ?>
-<div class="right-sidebar">
+<div class="right-sidebar d-flex flex-column">
     <div class="p-3">
         <div class="card rounded-4 mb-4">
             <div class="p-3">
@@ -25,6 +25,11 @@ function render_right_sidebar() {
                 </div>
             </div>
         </div>
+        <div class="links-wrapper d-flex w-100 mt-auto gap-3 justify-content-center">
+        <a href="#" class="d-block mb-3">about us</a>
+        <a href="#" class="d-block mb-3">about y</a>
+        <span class="mb-3">&copy; Y, 2025</span>
+    </div>
     </div>
 </div>
 <?php
