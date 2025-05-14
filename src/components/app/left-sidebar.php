@@ -23,6 +23,12 @@ function render_left_sidebar($user) {
                     profile
                 </a>
             </div>
+            <div>
+                <a href="search.php" class="d-flex align-items-center text-decoration-none fs-5 py-2 px-3 rounded-3 hover-highlight <?= basename($_SERVER['PHP_SELF']) === 'search.php' ? 'active' : '' ?>">
+                    <i class="bi bi-search me-3"></i>
+                    search
+                </a>
+            </div>
         </div>
     </nav>
     

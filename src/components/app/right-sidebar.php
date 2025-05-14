@@ -7,6 +7,18 @@ function render_right_sidebar() {
 ?>
 <div class="right-sidebar d-flex flex-column">
     <div class="p-3">
+        <!-- Quick search bar -->
+        <div class="quick-search-container mb-3">
+            <form action="search.php" method="GET">
+                <div class="input-group">
+                    <input type="text" class="form-control rounded-start-3" name="keywords" placeholder="search..." aria-label="Search">
+                    <button class="btn btn-primary rounded-end-3" type="submit">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
         <div class="card rounded-4 mb-4">
             <div class="p-3">
                 <h3 class="fs-5 mb-3">trending hashtags</h3>
