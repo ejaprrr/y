@@ -11,8 +11,8 @@ function render_header($title) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="Eliáš Jan Procházka, Filip Nagy, Petr Novák">
     <meta name="description" content="a social platform inspired by X, developed as a school project at VOŠ a SPŠE Plzeň.">
-    <meta name="keywords" content="social, platform, X, twitter, school project, VOŠ a SPŠE Plzeň">
-    
+    <meta name="keyword" content="social, platform, X, twitter, school project, VOŠ a SPŠE Plzeň">
+
     <title><?= APP_NAME ?> | <?= $title ?></title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">

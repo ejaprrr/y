@@ -1,38 +1,6 @@
-/* Search form styling */
-.search-form-container {
-  margin-bottom: 1rem;
-}
-
-.search-form .form-label {
-  color: var(--gray-200);
-  margin-bottom: 0.25rem;
-}
-
-.search-form .form-control,
-.search-form .form-select {
-  background-color: var(--gray-800);
-  border: 1px solid var(--gray-600);
-  color: var(--gray-100);
-}
-
-.search-form .form-control:focus,
-.search-form .form-select:focus {
-  border-color: var(--blue);
-  box-shadow: 0 0 0 0.25rem rgba(72, 149, 239, 0.25);
-}
-
 .search-form .form-check-input {
   background-color: var(--gray-700);
   border-color: var(--gray-500);
-}
-
-.search-form .form-check-input:checked {
-  background-color: var(--blue);
-  border-color: var(--blue);
-}
-
-.search-form .form-check-label {
-  color: var(--gray-300);
 }
 
 .search-form .form-text {
@@ -40,12 +8,16 @@
   font-size: 0.8rem;
 }
 
-/* Multi-select dropdown styling */
+.date-icon {
+  background-color: var(--gray-700);
+}
+
 .search-form select[multiple] {
   background-color: var(--gray-800);
   border: 1px solid var(--gray-600);
   color: var(--gray-100);
   padding: 0.5rem;
+  height: 100px;
 }
 
 .search-form select[multiple] option {
@@ -80,22 +52,4 @@
 
 .search-form input[type="date"]::-webkit-calendar-picker-indicator:hover {
   opacity: 1;
-}
-
-/* Quick search container in right sidebar */
-.quick-search-container .form-control {
-  background-color: var(--gray-800);
-  border: 1px solid var(--gray-600);
-  color: var(--gray-100);
-}
-
-.quick-search-container .form-control:focus {
-  background-color: var(--gray-700);
-}
-
-/* Highlighting for search results */
-.search-highlight {
-  background-color: rgba(72, 149, 239, 0.2);
-  padding: 0 0.2rem;
-  border-radius: 2px;
 }

@@ -11,7 +11,7 @@ function render_right_sidebar() {
         <div class="quick-search-container mb-3">
             <form action="search.php" method="GET">
                 <div class="input-group">
-                    <input type="text" class="form-control rounded-start-3" name="keywords" placeholder="search..." aria-label="Search">
+                    <input type="text" class="form-control rounded-start-3" name="keyword" placeholder="search..." aria-label="Search">
                     <button class="btn btn-primary rounded-end-3" type="submit">
                         <i class="bi bi-search"></i>
                     </button>
