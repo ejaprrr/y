@@ -4,7 +4,7 @@ require_once '../../src/functions/like.php';
 require_once '../../src/functions/user.php';
 require_once '../../src/functions/helpers.php';
 require_once '../../src/functions/hashtag.php';
-require_once 'app/profile-picture.php';
+require_once 'profile-picture.php';
 
 function render_post($post, $conn) {
     $post_user = get_user_by_username($conn, $post['username']);

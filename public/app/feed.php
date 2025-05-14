@@ -6,12 +6,12 @@ require_once "../../src/functions/validation.php";
 require_once "../../src/functions/post.php";
 require_once "../../src/functions/user.php";
 require_once "../../src/components/layout.php";
-require_once "../../src/components/post.php";
-require_once "../../src/components/empty-state.php";
+require_once "../../src/components/app/post.php";
+require_once "../../src/components/app/empty-state.php";
 require_once "../../src/components/app/left-sidebar.php";
 require_once "../../src/components/app/right-sidebar.php";
 require_once "../../src/components/app/page-header.php";
-require_once "../../src/components/app/composer.php";
+require_once "../../src/components/app/post-composer.php";
 
 // authentication check
 if (!check_login()) {
@@ -75,8 +75,8 @@ if ($active_tab === 'following') {
 <link rel="stylesheet" href="../assets/css/components/hashtag.css">
 <link rel="stylesheet" href="../assets/css/components/left-sidebar.css">
 <link rel="stylesheet" href="../assets/css/components/right-sidebar.css">
-<link rel="stylesheet" href="../assets/css/components/composer.css">
-<link rel="stylesheet" href="../assets/css/components/empty-state.css">
+<link rel="stylesheet" href="../assets/css/components/post-composer.css">
+<link rel="stylesheet" href="../assets/css/components/app/empty-state.css">
 <link rel="stylesheet" href="../assets/css/components/page-header.css">
 
 <div class="d-flex">
@@ -101,7 +101,7 @@ if ($active_tab === 'following') {
 
         <!-- render page header + composer -->
         <?= render_page_header('feed', 'browse posts and engage with content!', '', $feed_tabs); ?>
-        <?= render_composer(); ?>
+        <?= render_post_composer(); ?>
 
         <!-- messages and errors -->
         <?php if (!empty($message)): ?>

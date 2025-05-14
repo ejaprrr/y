@@ -5,7 +5,7 @@ function render_left_sidebar($user) {
 <div class="left-sidebar">
     <!-- logo -->
     <div class="p-4">
-        <img src="../assets/logo.svg" alt="logo" class="logo-svg">
+        <img src="../assets/images/logo.svg" alt="logo" class="logo-svg">
     </div>
     
     <!-- navigation -->

@@ -11,7 +11,7 @@ render_header("about us");
 
 <div class="splash-container">
     <div class="text-center mb-4">
-        <img src="../assets/logo.svg" alt="Y logo" class="splash-logo">
+        <img src="../assets/images/logo.svg" alt="Y logo" class="splash-logo">
         <h1 class="display-4 fw-bold mb-2">about <span class="gradient-text">us, the <span class="underline">creators</span>.</span></h1>
         <p class="tagline">meet the team behind</p>
     </div>

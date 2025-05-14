@@ -45,8 +45,8 @@ function render_right_sidebar() {
         </div>
         
         <div class="links-wrapper d-flex w-100 mt-auto gap-3 justify-content-center">
-            <a href="../about/home.php" class="d-block mb-3 text-lowercase">home</a>
-            <a href="../about/about-us.php" class="d-block mb-3 text-lowercase">about us</a>
+            <a href="../landing/home.php" class="d-block mb-3 text-lowercase">home</a>
+            <a href="../landing/about-us.php" class="d-block mb-3 text-lowercase">about us</a>
             <span class="mb-3">&copy; Y, 2025</span>
         </div>
     </div>

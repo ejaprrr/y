@@ -5,12 +5,12 @@ require_once "../../src/functions/auth.php";
 require_once "../../src/functions/post.php";
 require_once "../../src/functions/user.php";
 require_once "../../src/functions/validation.php";
-require_once "../../src/components/post.php";
+require_once "../../src/components/app/post.php";
 require_once "../../src/components/layout.php";
 require_once "../../src/components/app/left-sidebar.php";
 require_once "../../src/components/app/right-sidebar.php";
 require_once "../../src/components/app/page-header.php";
-require_once "../../src/components/empty-state.php";
+require_once "../../src/components/app/empty-state.php";
 
 // authentication check
 if (!check_login()) {
@@ -73,11 +73,6 @@ $active_tab = isset($_GET['tab']) ? sanitize_input($_GET['tab']) : 'posts';
                 'label' => 'posts',
                 'url' => '?username=' . htmlspecialchars($profile_user['username']) . '&tab=posts',
                 'active' => $active_tab === 'posts'
-            ],
-            [
-                'label' => 'replies',
-                'url' => '?username=' . htmlspecialchars($profile_user['username']) . '&tab=replies',
-                'active' => $active_tab === 'replies'
             ],
             [
                 'label' => 'likes',

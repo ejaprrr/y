@@ -6,7 +6,7 @@ require_once "../../src/functions/validation.php";
 require_once "../../src/functions/helpers.php";
 require_once "../../src/components/layout.php";
 require_once "../../src/components/auth/sidebar.php";
-require_once "../../src/components/auth/container.php";
+require_once "../../src/components/auth/form-container.php";
 
 start_session();
 set_csrf_token();
@@ -39,12 +39,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <?php render_header("log in"); ?>
 
 <link rel="stylesheet" href="../assets/css/pages/auth.css">
-<link rel="stylesheet" href="../assets/css/components/container.css">
+<link rel="stylesheet" href="../assets/css/components/form-container.css">
 <link rel="stylesheet" href="../assets/css/components/sidebar.css">
 
 <div class="d-flex h-100">
     <?php render_sidebar(); ?>
-    <?php render_container_start("welcome back!", "log back into your account."); ?>
+    <?php render_form_container_start("welcome back!", "log back into your account."); ?>
 
     <?php if (!empty($error)): ?>
         <div class="alert alert-danger m-3"><?= $error ?></div>
@@ -66,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </form>
     <span class="mt-4 d-block w-100 text-center">don't have an account? <a href="sign-up.php">sign up</a></span>
 
-    <?php render_container_end(); ?>
+    <?php render_form_container_end(); ?>
 </div>
 
 <script src="../assets/js/log-in.js"></script>

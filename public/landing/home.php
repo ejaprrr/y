@@ -11,7 +11,7 @@ require_once "../../src/components/layout.php";
 
 <div class="splash-container">
     <div class="text-center mb-4">
-        <img src="../assets/logo.svg" alt="Y logo" class="splash-logo">
+        <img src="../assets/images/logo.svg" alt="Y logo" class="splash-logo">
         <h1 class="display-4 fw-bold mb-2">welcome to <span class="gradient-text">this <span class="underline">awesome</span> platform.</span></h1>
         <p class="tagline">it's ahead of &#x1D54F;.</p>
     </div>

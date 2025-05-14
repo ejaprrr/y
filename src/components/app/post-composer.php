@@ -1,5 +1,5 @@
 <?php
-function render_composer() {
+function render_post_composer() {
 ?>
 <div class="composer">
   <div class="card rounded-4 mx-3 my-3 p-3">

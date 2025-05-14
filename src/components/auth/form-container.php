@@ -1,5 +1,5 @@
 <?php
-function render_container_start($title, $subtitle) {
+function render_form_container_start($title, $subtitle) {
 ?>
 <div class="content-area d-flex justify-content-center align-items-center">
     <div class="card form-wrapper w-100 rounded-4 overflow-hidden">
@@ -11,7 +11,7 @@ function render_container_start($title, $subtitle) {
 <?php
 }
 
-function render_container_end() {
+function render_form_container_end() {
 ?>
         </div>
     </div>

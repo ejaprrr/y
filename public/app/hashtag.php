@@ -8,8 +8,8 @@ require_once "../../src/functions/post.php";
 require_once "../../src/functions/user.php";
 require_once "../../src/functions/hashtag.php";
 require_once "../../src/components/layout.php";
-require_once "../../src/components/post.php";
-require_once "../../src/components/empty-state.php";
+require_once "../../src/components/app/post.php";
+require_once "../../src/components/app/empty-state.php";
 require_once "../../src/components/app/left-sidebar.php";
 require_once "../../src/components/app/right-sidebar.php";
 require_once "../../src/components/app/page-header.php";
@@ -45,7 +45,7 @@ $post_count = get_hashtag_post_count($conn, $tag);
 <link rel="stylesheet" href="../assets/css/components/hashtag.css">
 <link rel="stylesheet" href="../assets/css/components/left-sidebar.css">
 <link rel="stylesheet" href="../assets/css/components/right-sidebar.css">
-<link rel="stylesheet" href="../assets/css/components/empty-state.css">
+<link rel="stylesheet" href="../assets/css/components/app/empty-state.css">
 <link rel="stylesheet" href="../assets/css/components/page-header.css">
 
 <div class="d-flex">
