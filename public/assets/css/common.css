@@ -139,3 +139,29 @@ textarea {
 .links-wrapper * {
   color: var(--gray-500);
 }
+
+.alert-success {
+  background-color: rgba(25, 135, 84, 0.2);
+  border-color: rgba(25, 135, 84, 0.3);
+  color: #75b798;
+}
+
+.alert-danger {
+  background-color: rgba(220, 53, 69, 0.2);
+  border-color: rgba(220, 53, 69, 0.3);
+  color: #ea868f;
+}
+
+.gradient-text {
+  background: linear-gradient(45deg, var(--blue), #8c52ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 600;
+}
+
+.underline {
+  text-decoration-line: underline;
+  text-underline-offset: 0.5rem;
+  text-decoration-style: wavy;
+}

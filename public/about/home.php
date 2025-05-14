@@ -7,60 +7,7 @@ require_once "../../src/components/layout.php";
 
 <?php render_header("welcome"); ?>
 
-<style>
-    .splash-container {
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
-    
-    .splash-logo {
-        width: 100px;
-        height: 100px;
-        margin-bottom: 2rem;
-    }
-    
-    .splash-card {
-        background-color: var(--gray-800);
-        border-radius: 1rem;
-        max-width: 600px;
-        width: 100%;
-        border: 1px solid var(--gray-700);
-    }
-    
-    .action-buttons .btn {
-        min-width: 120px;
-    }
-    
-    .features-list {
-        color: var(--gray-300);
-        display: inline-block;
-        margin: 0 auto;
-    }
-    
-    .tagline {
-        font-size: 1.5rem;
-        font-weight: 300;
-        margin-bottom: 2rem;
-        color: var(--gray-200);
-    }
-    
-    .gradient-text {
-        background: linear-gradient(45deg, var(--blue), #8c52ff);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-        font-weight: 600;
-    }
-
-    .underline {
-        text-decoration-line: underline;
-        text-underline-offset: 0.5rem;
-        text-decoration-style: wavy;
-    }
-</style>
+<link rel="stylesheet" href="../assets/css/pages/about.css">
 
 <div class="splash-container">
     <div class="text-center mb-4">

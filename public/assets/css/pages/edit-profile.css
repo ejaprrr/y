@@ -110,19 +110,6 @@
   margin-bottom: 0.5rem;
 }
 
-/* Alert styling */
-.alert-success {
-  background-color: rgba(25, 135, 84, 0.2);
-  border-color: rgba(25, 135, 84, 0.3);
-  color: #75b798;
-}
-
-.alert-danger {
-  background-color: rgba(220, 53, 69, 0.2);
-  border-color: rgba(220, 53, 69, 0.3);
-  color: #ea868f;
-}
-
 /* Empty state styling */
 .empty-state i {
   color: var(--gray-600);

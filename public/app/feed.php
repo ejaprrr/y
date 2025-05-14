@@ -17,6 +17,9 @@ require_once "../../src/components/app/composer.php";
 if (!check_login()) {
     redirect("../auth/log-in.php");
 }
+// initialize variables
+$message = '';
+$error = '';
 
 // upload base directory
 $upload_base = realpath(__DIR__ . "/../uploads");
@@ -35,27 +38,26 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // check CSRF token
     $valid = check_csrf_token();
     if (!$valid) {
-        echo "Invalid CSRF token.";
-        exit();
-    }
-
-    // sanitize and validate content
-    $content = sanitize_post_content($_POST['content'] ?? '');
-    $content_validation = validate_post_content($content);
-    
-    if ($content_validation !== true) {
-        echo $content_validation;
-        exit();
-    }
-
-    // add post
-    $success = add_post($conn, $user["username"], $content);
-    if ($success) {
-        redirect("feed.php");
+        $error = "invalid CSRF token";
     } else {
-        echo "Error saving post.";
-        exit();
+        // sanitize and validate content
+        $content = sanitize_post_content($_POST['content'] ?? '');
+        $content_validation = validate_post_content($content);
+        
+        if ($content_validation !== true) {
+            $error = $content_validation;
+        } else {
+            // add post
+            $success = add_post($conn, $user["username"], $content);
+            if ($success) {
+                $message = "post created successfully";
+            } else {
+                $error = "failed to create post";
+            }
+        }
     }
+
+    
 }
 
 // get posts based on active tab
@@ -95,13 +97,20 @@ if ($active_tab === 'following') {
                     'active' => $active_tab === 'following'
                 ]
             ];
-            
-            // Render page header with tabs
-            render_page_header('feed', 'browse posts and engage with content!', '', $feed_tabs);
-            
-            // Render composer
-            render_composer();
         ?>
+
+        <!-- render page header + composer -->
+        <?= render_page_header('feed', 'browse posts and engage with content!', '', $feed_tabs); ?>
+        <?= render_composer(); ?>
+
+        <!-- messages and errors -->
+        <?php if (!empty($message)): ?>
+            <div class="alert alert-success m-3"><?= $message ?></div>
+        <?php endif; ?>
+        
+        <?php if (!empty($error)): ?>
+            <div class="alert alert-danger m-3"><?= $error ?></div>
+        <?php endif; ?>
         
         <div class="posts mx-3">
             <!-- render posts / empty state -->

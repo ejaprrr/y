@@ -1,0 +1,48 @@
+body {
+  background: linear-gradient(0deg, var(--gray-900), var(--gray-800));
+}
+.splash-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.splash-logo {
+  width: 100px;
+  height: 100px;
+  margin-bottom: 2rem;
+}
+
+.splash-card {
+  background-color: var(--gray-800);
+  border-radius: 1rem;
+  max-width: 600px;
+  width: 100%;
+  border: 1px solid var(--gray-700);
+}
+
+.action-buttons .btn {
+  min-width: 120px;
+}
+
+.features-list {
+  color: var(--gray-300);
+  display: inline-block;
+  margin: 0 auto;
+}
+
+.tagline {
+  font-size: 1.5rem;
+  font-weight: 300;
+  margin-bottom: 2rem;
+  color: var(--gray-200);
+}
+
+.team-member {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}

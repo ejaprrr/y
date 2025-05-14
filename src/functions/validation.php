@@ -2,48 +2,48 @@
 // Validation functions
 function validate_username($username) {
     if (empty($username)) {
-        return "Username is required.";
+        return "username is required";
     }
     if (strlen($username) < 3 || strlen($username) > 24) {
-        return "Username must be between 3 and 24 characters.";
+        return "username must be between 3 and 24 characters";
     }
     if (!preg_match('/^[a-z0-9_]+$/', $username)) {
-        return "Username can only contain lowercase letters, numbers, and underscores.";
+        return "username can only contain lowercase letters, numbers, and underscores";
     }
     if ($username[0] === '_') {
-        return "Username cannot start with an underscore.";
+        return "username cannot start with an underscore";
     }
     return true;
 }
 
 function validate_password($password) {
     if (empty($password)) {
-        return "Password is required.";
+        return "password is required";
     }
     if (strlen($password) < 8) {
-        return "Password must be at least 8 characters long.";
+        return "password must be at least 8 characters long";
     }
     if (!preg_match('/[a-z]/', $password)) {
-        return "Password must contain at least one lowercase letter.";
+        return "password must contain at least one lowercase letter";
     }
     if (!preg_match('/[A-Z]/', $password)) {
-        return "Password must contain at least one uppercase letter.";
+        return "password must contain at least one uppercase letter";
     }
     if (!preg_match('/[0-9]/', $password)) {
-        return "Password must contain at least one number.";
+        return "password must contain at least one number";
     }
     if (!preg_match('/[\W_]/', $password)) {
-        return "Password must contain at least one special character.";
+        return "password must contain at least one special character";
     }
     return true;
 }
 
 function validate_post_content($content) {
     if (empty($content)) {
-        return "Post content cannot be empty.";
+        return "post content cannot be empty";
     }
     if (strlen($content) > 256) {
-        return "Post content cannot exceed 256 characters.";
+        return "post content cannot exceed 256 characters";
     }
     return true;
 }
