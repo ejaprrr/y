@@ -35,12 +35,15 @@ function render_left_sidebar($user) {
     <!-- user profile -->
     <div class="mt-auto p-3">
         <div class="d-flex align-items-center p-3 rounded-3">
-            <!-- profile picture -->
-            <?php render_profile_picture($user); ?>
-            <div>
-                <div class="fw-bold"><?= htmlspecialchars($user["display_name"] ?? $user["username"]) ?></div>
-                <small>@<?= htmlspecialchars($user["username"]) ?></small>
-            </div>
+            <!-- Make profile picture and text clickable -->
+            <a href="profile.php?origin=<?= get_clean_url() ?>" class="d-flex align-items-center text-decoration-none flex-grow-1">
+                <!-- profile picture -->
+                <?php render_profile_picture($user); ?>
+                <div>
+                    <div class="fw-bold user-link"><?= htmlspecialchars($user["display_name"] ?? $user["username"]) ?></div>
+                    <small class="user-handle">@<?= htmlspecialchars($user["username"]) ?></small>
+                </div>
+            </a>
             <div class="ms-auto">
                 <a href="../auth/log-out.php" class="text-decoration-none logout-link">
                     <i class="bi bi-box-arrow-right fs-5"></i>

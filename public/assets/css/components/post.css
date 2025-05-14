@@ -8,14 +8,6 @@
   border-radius: 0.25rem;
 }
 
-.user-link {
-  color: var(--gray-100);
-}
-
-.user-handle {
-  color: var(--gray-400);
-}
-
 .action-btn:hover {
   background-color: rgba(255, 255, 255, 0.1);
   color: var(--gray-200);

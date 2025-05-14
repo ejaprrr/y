@@ -159,7 +159,7 @@ textarea {
 .alert-danger {
   background-color: rgba(220, 53, 69, 0.2);
   border-color: rgba(220, 53, 69, 0.3);
-  color: #ea868f;
+  color: var(--red);
 }
 
 .gradient-text {
@@ -174,4 +174,12 @@ textarea {
   text-decoration-line: underline;
   text-underline-offset: 0.5rem;
   text-decoration-style: wavy;
+}
+
+.user-link {
+  color: var(--gray-100);
+}
+
+.user-handle {
+  color: var(--gray-400);
 }
