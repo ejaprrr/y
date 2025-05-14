@@ -14,6 +14,7 @@ require_once "../../src/components/app/left-sidebar.php";
 require_once "../../src/components/app/right-sidebar.php";
 require_once "../../src/components/app/page-header.php";
 require_once "../../src/components/app/empty-state.php";
+require_once "../../src/components/app/pagination.php";
 
 // authentication check
 if (!check_login()) {
@@ -36,13 +37,19 @@ if (!$profile_user) {
     exit();
 }
 
-// get user"s posts
-$posts = get_user_posts($conn, $profile_user["id"]);
+// Add pagination parameters
+$posts_per_page = 10;
+$current_page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 
-// get user"s liked posts
-$liked_posts = get_user_liked_posts($conn, $profile_user["id"]);
+// get user's posts with pagination
+$total_user_posts = get_total_user_posts($conn, $profile_user["id"]);
+$posts = get_user_posts($conn, $profile_user["id"], $current_page, $posts_per_page);
 
-// determine if this is the current user"s profile
+// get user's liked posts with pagination
+$total_liked_posts = get_total_user_liked_posts($conn, $profile_user["id"]);
+$liked_posts = get_user_liked_posts($conn, $profile_user["id"], $current_page, $posts_per_page);
+
+// determine if this is the current user's profile
 $is_own_profile = ($profile_user["id"] == $_SESSION["user_id"]);
 
 // fetch stats
@@ -176,6 +183,10 @@ $active_tab = isset($_GET["tab"]) ? sanitize_input($_GET["tab"]) : "posts";
                         <?php foreach ($posts as $post): ?>
                             <?php render_post($post, $conn); ?> 
                         <?php endforeach; ?>
+                        <?php 
+                            $base_url = "profile.php?username=" . urlencode($profile_user["username"]) . "&tab=posts";
+                            render_pagination($total_user_posts, $posts_per_page, $current_page, $base_url);
+                        ?>
                     <?php else: ?>
                         <?php 
                         if ($is_own_profile) {
@@ -198,6 +209,10 @@ $active_tab = isset($_GET["tab"]) ? sanitize_input($_GET["tab"]) : "posts";
                         <?php foreach ($liked_posts as $post): ?>
                             <?php render_post($post, $conn); ?> 
                         <?php endforeach; ?>
+                        <?php 
+                            $base_url = "profile.php?username=" . urlencode($profile_user["username"]) . "&tab=likes";
+                            render_pagination($total_liked_posts, $posts_per_page, $current_page, $base_url);
+                        ?>
                     <?php else: ?>
                         <?php 
                         if ($is_own_profile) {

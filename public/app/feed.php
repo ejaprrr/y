@@ -12,6 +12,7 @@ require_once "../../src/components/app/left-sidebar.php";
 require_once "../../src/components/app/right-sidebar.php";
 require_once "../../src/components/app/page-header.php";
 require_once "../../src/components/app/post-composer.php";
+require_once "../../src/components/app/pagination.php";
 
 // authentication check
 if (!check_login()) {
@@ -32,6 +33,10 @@ $user = get_user($conn, $_SESSION["user_id"]);
 
 // determine active tab
 $active_tab = isset($_GET["tab"]) && $_GET["tab"] === "following" ? "following" : "latest";
+
+// Pagination settings
+$posts_per_page = 10;
+$current_page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 
 // check if form was submitted
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -56,15 +61,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             }
         }
     }
-
-    
 }
 
-// get posts based on active tab
+// get posts based on active tab with pagination
 if ($active_tab === "following") {
-    $posts = get_following_posts($conn, $user["id"]);
+    $total_posts = get_total_following_posts($conn, $user["id"]);
+    $posts = get_following_posts($conn, $user["id"], $current_page, $posts_per_page);
 } else {
-    $posts = get_posts($conn);
+    $total_posts = get_total_posts($conn);
+    $posts = get_posts($conn, $current_page, $posts_per_page);
 }
 ?>
 
@@ -117,6 +122,13 @@ if ($active_tab === "following") {
                 <?php foreach ($posts as $post): ?>
                     <?php render_post($post, $conn); ?> 
                 <?php endforeach; ?>
+                
+                <!-- Render pagination -->
+                <?php 
+                    // Build the base URL for pagination
+                    $base_url = "feed.php?tab=" . $active_tab;
+                    render_pagination($total_posts, $posts_per_page, $current_page, $base_url);
+                ?>
             <?php else: ?>
                 <?php 
                     $message = $active_tab === "following" 

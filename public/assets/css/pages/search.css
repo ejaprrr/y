@@ -57,3 +57,45 @@ select[multiple].has-overflow::-webkit-scrollbar {
   color: var(--gray-100);
   padding: 0.5rem 0.75rem;
 }
+
+/* Pagination styling for search page */
+.pagination {
+  gap: 5px;
+}
+
+.pagination .page-item .page-link {
+  background-color: var(--gray-800);
+  color: var(--gray-300);
+  border: 1px solid var(--gray-700);
+  border-radius: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.pagination .page-item .page-link:hover {
+  background-color: var(--gray-700);
+  color: var(--gray-100);
+  border-color: var(--gray-600);
+}
+
+.pagination .page-item.active .page-link {
+  background-color: var(--gray-700);
+  color: var(--gray-100);
+  border-color: var(--gray-600);
+  font-weight: bold;
+}
+
+.pagination .page-item.disabled .page-link {
+  background-color: var(--gray-800);
+  color: var(--gray-600);
+  border-color: var(--gray-700);
+  cursor: not-allowed;
+}
+
+.pagination .page-link:focus {
+  box-shadow: none;
+  background-color: var(--gray-700);
+  color: var(--gray-300);
+  border-color: var(--gray-600);
+}

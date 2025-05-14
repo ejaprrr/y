@@ -13,6 +13,7 @@ require_once "../../src/components/app/empty-state.php";
 require_once "../../src/components/app/left-sidebar.php";
 require_once "../../src/components/app/right-sidebar.php";
 require_once "../../src/components/app/page-header.php";
+require_once "../../src/components/app/pagination.php";
 
 // Authentication check
 if (!check_login()) {
@@ -35,11 +36,15 @@ if (empty($tag)) {
 // Determine active tab (default to "latest")
 $active_tab = isset($_GET["tab"]) ? sanitize_input($_GET["tab"]) : "latest";
 
-// Fetch posts based on the active tab
+// Pagination settings
+$posts_per_page = 10;
+$current_page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+
+// Fetch posts based on the active tab with pagination
 if ($active_tab === "most_liked") {
-    $posts = get_posts_by_hashtag_sorted($conn, $tag, "like_count");
+    $posts = get_posts_by_hashtag_sorted($conn, $tag, "like_count", $current_page, $posts_per_page);
 } else {
-    $posts = get_posts_by_hashtag_sorted($conn, $tag, "created_at");
+    $posts = get_posts_by_hashtag_sorted($conn, $tag, "created_at", $current_page, $posts_per_page);
 }
 
 $post_count = get_hashtag_post_count($conn, $tag);
@@ -99,6 +104,14 @@ $post_count = get_hashtag_post_count($conn, $tag);
                         "no posts with #" . htmlspecialchars($tag) . " yet",
                         "be the first to use this hashtag!"
                     );
+                ?>
+            <?php endif; ?>
+
+            <!-- Add pagination after the posts -->
+            <?php if (!empty($posts)): ?>
+                <?php 
+                    $base_url = "hashtag.php?tag=" . urlencode($tag) . "&tab=" . $active_tab;
+                    render_pagination($post_count, $posts_per_page, $current_page, $base_url);
                 ?>
             <?php endif; ?>
         </div>
