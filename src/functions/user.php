@@ -74,11 +74,11 @@ function update_cover_image($conn, $user_id, $cover_image) {
 }
 
 function get_user_posts($conn, $user_id) {
-    $stmt = $conn->prepare("SELECT p.id, u.username, p.content, p.created_at 
-                           FROM posts p 
-                           JOIN users u ON p.user_id = u.id 
-                           WHERE p.user_id = ?
-                           ORDER BY p.created_at DESC");
+    $stmt = $conn->prepare("SELECT posts.id, users.username, posts.content, posts.created_at 
+                           FROM posts JOIN users
+                           ON posts.user_id = users.id 
+                           WHERE posts.user_id = ?
+                           ORDER BY posts.created_at DESC");
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -88,12 +88,13 @@ function get_user_posts($conn, $user_id) {
 }
 
 function get_user_liked_posts($conn, $user_id) {
-    $stmt = $conn->prepare("SELECT p.id, u.username, p.content, p.created_at 
-                           FROM posts p 
-                           JOIN users u ON p.user_id = u.id
-                           JOIN likes l ON p.id = l.post_id
-                           WHERE l.user_id = ?
-                           ORDER BY l.created_at DESC");
+    $stmt = $conn->prepare("SELECT posts.id, users.username, posts.content, posts.created_at 
+                           FROM posts JOIN users
+                           ON posts.user_id = users.id
+                           JOIN likes
+                           ON posts.id = likes.post_id
+                           WHERE likes.user_id = ?
+                           ORDER BY likes.created_at DESC");
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -131,9 +132,10 @@ function is_following($conn, $follower_id, $followed_id) {
 }
 
 function get_total_likes_received($conn, $user_id) {
-    $stmt = $conn->prepare("SELECT COUNT(*) AS count FROM likes l 
-                            JOIN posts p ON l.post_id = p.id 
-                            WHERE p.user_id = ?");
+    $stmt = $conn->prepare("SELECT COUNT(*) AS count
+                            FROM likes JOIN posts
+                            ON likes.post_id = posts.id 
+                            WHERE posts.user_id = ?");
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
     $result = $stmt->get_result()->fetch_assoc();
@@ -143,16 +145,15 @@ function get_total_likes_received($conn, $user_id) {
 
 function perform_search($conn, $params, $user_id) {
     // Build search query based on parameters
-    $sql_parts = [];
     $sql_params = [];
     $sql_types = "";
     
     // Base query to get posts with user info and like counts
-    $base_sql = "SELECT p.*, u.username, u.display_name, u.profile_picture,
-                (SELECT COUNT(*) FROM likes WHERE post_id = p.id) AS like_count,
-                EXISTS(SELECT 1 FROM likes WHERE post_id = p.id AND user_id = ?) AS is_liked
-                FROM posts p
-                JOIN users u ON p.user_id = u.id";
+    $base_sql = "SELECT posts.*, users.username, users.display_name, users.profile_picture,
+                (SELECT COUNT(*) FROM likes WHERE post_id = posts.id) AS like_count,
+                EXISTS(SELECT 1 FROM likes WHERE post_id = posts.id AND user_id = ?) AS is_liked
+                FROM posts
+                JOIN users ON posts.user_id = users.id";
     
     // Add user_id parameter
     $sql_params[] = $user_id;
@@ -179,8 +180,8 @@ function perform_search($conn, $params, $user_id) {
                 
                 // For whole word search
                 $search_pattern = "[[:<:]]" . preg_quote($word) . "[[:>:]]";
-                $keyword_conditions[] = "(p.content REGEXP ? OR u.username REGEXP ? OR u.display_name REGEXP ? OR 
-                                        EXISTS(SELECT 1 FROM hashtags h WHERE h.post_id = p.id AND h.hashtag REGEXP ?))";
+                $keyword_conditions[] = "(posts.content REGEXP ? OR users.username REGEXP ? OR users.display_name REGEXP ? OR 
+                                        EXISTS(SELECT 1 FROM hashtags WHERE hashtags.post_id = posts.id AND hashtags.hashtag REGEXP ?))";
                 $sql_params[] = $search_pattern;
                 $sql_params[] = $search_pattern;
                 $sql_params[] = $search_pattern;
@@ -194,8 +195,8 @@ function perform_search($conn, $params, $user_id) {
         } else {
             // For partial word search
             $search_pattern = "%" . $keyword_search . "%";
-            $where_conditions[] = "(p.content $like_operator ? OR u.username $like_operator ? OR u.display_name $like_operator ? OR
-                                 EXISTS(SELECT 1 FROM hashtags h WHERE h.post_id = p.id AND h.hashtag $like_operator ?))";
+            $where_conditions[] = "(posts.content $like_operator ? OR users.username $like_operator ? OR users.display_name $like_operator ? OR
+                                 EXISTS(SELECT 1 FROM hashtags WHERE hashtags.post_id = posts.id AND hashtags.hashtag $like_operator ?))";
             $sql_params[] = $search_pattern;
             $sql_params[] = $search_pattern;
             $sql_params[] = $search_pattern;
@@ -211,8 +212,8 @@ function perform_search($conn, $params, $user_id) {
         
         // For exclude, we want posts that DON'T contain these terms
         $search_pattern = "%" . $exclude_search . "%";
-        $where_conditions[] = "(p.content NOT $like_operator ? AND u.username NOT $like_operator ? AND u.display_name NOT $like_operator ? AND
-                             NOT EXISTS(SELECT 1 FROM hashtags h WHERE h.post_id = p.id AND h.hashtag $like_operator ?))";
+        $where_conditions[] = "(posts.content NOT $like_operator ? AND users.username NOT $like_operator ? AND users.display_name NOT $like_operator ? AND
+                             NOT EXISTS(SELECT 1 FROM hashtags WHERE hashtags.post_id = posts.id AND hashtags.hashtag $like_operator ?))";
         $sql_params[] = $search_pattern;
         $sql_params[] = $search_pattern;
         $sql_params[] = $search_pattern;
@@ -253,11 +254,11 @@ function perform_search($conn, $params, $user_id) {
     // Sorting
     switch ($params['sort_by']) {
         case 'popular':
-            $sql .= " ORDER BY like_count DESC, p.created_at DESC";
+            $sql .= " ORDER BY like_count DESC, posts.created_at DESC";
             break;
         case 'recent':
         default:
-            $sql .= " ORDER BY p.created_at DESC";
+            $sql .= " ORDER BY posts.created_at DESC";
             break;
     }
     
@@ -287,11 +288,11 @@ function perform_search($conn, $params, $user_id) {
 
 function get_followed_users($conn, $user_id) {
     $stmt = $conn->prepare("
-        SELECT u.id, u.username, u.display_name, u.profile_picture
-        FROM users u
-        JOIN follows f ON u.id = f.followed_id
-        WHERE f.follower_id = ?
-        ORDER BY u.username
+        SELECT users.id, users.username, users.display_name, users.profile_picture
+        FROM users
+        JOIN follows ON users.id = follows.followed_id
+        WHERE follows.follower_id = ?
+        ORDER BY users.username
     ");
     
     $stmt->bind_param("i", $user_id);

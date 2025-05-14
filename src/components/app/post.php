@@ -29,17 +29,22 @@ function render_post($post, $conn) {
         </div>
     </div>
 
-    <!-- post content with hashtags highlighted -->
+    <!-- post content with hashtagsighlighted -->
     <div class="mb-3">
         <?= format_content_with_hashtags(nl2br(htmlspecialchars_decode($post['content']))) ?>
     </div>
 
     <!-- actions and stats -->
     <div class="d-flex">
-        <button class="like-btn hover-highlight d-flex align-items-center" data-liked="<?= has_liked($conn, $_SESSION['user_id'], $post['id']) ? '1' : '0' ?>">
+        <button class="action-btn like-btn hover-highlight d-flex align-items-center" data-liked="<?= has_liked($conn, $_SESSION['user_id'], $post['id']) ? '1' : '0' ?>">
             <i class="bi <?= has_liked($conn, $_SESSION['user_id'], $post['id']) ? 'bi-heart-fill liked' : 'bi-heart' ?>"></i>
             <span class="like-count"><?= get_like_count($conn, $post['id']) ?></span>
         </button>
+        <?php if ($post_user["id"] == $_SESSION["user_id"]): ?>
+            <button class="action-btn delete-btn hover-highlight d-flex align-items-center ms-3" data-post-id="<?= $post['id'] ?>">
+                <i class="bi bi-trash"></i>
+            </button>
+        <?php endif; ?>
     </div>
 </div>
 </div>

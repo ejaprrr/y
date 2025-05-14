@@ -41,10 +41,10 @@ function add_post($conn, $username, $content) {
 }
 
 function get_posts($conn) {
-    $stmt = $conn->prepare("SELECT p.id, u.username, p.content, p.created_at 
-                           FROM posts p 
-                           JOIN users u ON p.user_id = u.id 
-                           ORDER BY p.created_at DESC");
+    $stmt = $conn->prepare("SELECT posts.id, users.username, posts.content, posts.created_at 
+                           FROM posts 
+                           JOIN users ON posts.user_id = users.id 
+                           ORDER BY posts.created_at DESC");
     $stmt->execute();
     $result = $stmt->get_result();
     $posts = $result->fetch_all(MYSQLI_ASSOC);
@@ -54,14 +54,14 @@ function get_posts($conn) {
 }
 
 function get_following_posts($conn, $user_id) {
-    $sql = "SELECT p.*, u.username, u.display_name, u.profile_picture,
-            (SELECT COUNT(*) FROM likes WHERE post_id = p.id) AS like_count,
-            EXISTS(SELECT 1 FROM likes WHERE post_id = p.id AND user_id = ?) AS is_liked
-            FROM posts p
-            JOIN users u ON p.user_id = u.id
-            JOIN follows f ON p.user_id = f.followed_id
-            WHERE f.follower_id = ?
-            ORDER BY p.created_at DESC";
+    $sql = "SELECT posts.*, users.username, users.display_name, users.profile_picture,
+            (SELECT COUNT(*) FROM likes WHERE post_id = posts.id) AS like_count,
+            EXISTS(SELECT 1 FROM likes WHERE post_id = posts.id AND user_id = ?) AS is_liked
+            FROM posts
+            JOIN users ON posts.user_id = users.id
+            JOIN follows ON posts.user_id = follows.followed_id
+            WHERE follows.follower_id = ?
+            ORDER BY posts.created_at DESC";
     
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ii", $user_id, $user_id);

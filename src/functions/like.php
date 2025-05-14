@@ -33,11 +33,11 @@ function unlike_post($conn, $user_id, $post_id) {
 }
 
 function get_like_count($conn, $post_id) {
-    $stmt = $conn->prepare("SELECT COUNT(*) as cnt FROM likes WHERE post_id = ?");
+    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM likes WHERE post_id = ?");
     $stmt->bind_param("i", $post_id);
     $stmt->execute();
     $result = $stmt->get_result()->fetch_assoc();
     $stmt->close();
-    return (int)($result['cnt'] ?? 0);
+    return (int)($result['count'] ?? 0);
 }
 ?>

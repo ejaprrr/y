@@ -74,4 +74,34 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
   });
+
+  // handle delete post
+  document.querySelectorAll(".delete-btn").forEach((btn) => {
+    btn.addEventListener("click", function () {
+      const postId = this.getAttribute("data-post-id");
+      const csrfToken = document.querySelector(
+        'input[name="csrf_token"]'
+      ).value;
+
+      fetch("interaction.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `target_id=${encodeURIComponent(
+          postId
+        )}&action=delete&csrf_token=${encodeURIComponent(csrfToken)}`,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            // Remove the post from the DOM
+            const postElement = document.querySelector(
+              `[data-post-id="${postId}"]`
+            );
+            if (postElement) {
+              postElement.remove();
+            }
+          }
+        });
+    });
+  });
 });

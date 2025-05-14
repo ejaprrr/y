@@ -55,14 +55,14 @@ function get_trending_hashtags($conn, $limit = 3) {
 
 // Get posts by hashtag
 function get_posts_by_hashtag($conn, $hashtag) {
-    $sql = "SELECT p.*, u.username, u.display_name, u.profile_picture,
-            (SELECT COUNT(*) FROM likes WHERE post_id = p.id) AS like_count,
-            EXISTS(SELECT 1 FROM likes WHERE post_id = p.id AND user_id = ?) AS is_liked
-            FROM posts p
-            JOIN users u ON p.user_id = u.id
-            JOIN hashtags h ON p.id = h.post_id
-            WHERE h.hashtag = ?
-            ORDER BY p.created_at DESC";
+    $sql = "SELECT posts.*, users.username, users.display_name, users.profile_picture,
+            (SELECT COUNT(*) FROM likes WHERE post_id = posts.id) AS like_count,
+            EXISTS(SELECT 1 FROM likes WHERE post_id = posts.id AND user_id = ?) AS is_liked
+            FROM posts
+            JOIN users ON posts.user_id = users.id
+            JOIN hashtags ON posts.id = hashtags.post_id
+            WHERE hashtags.hashtag = ?
+            ORDER BY posts.created_at DESC";
             
     $stmt = $conn->prepare($sql);
     $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0;

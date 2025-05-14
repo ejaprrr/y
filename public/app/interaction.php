@@ -96,6 +96,45 @@ if ($action === 'follow' || $action === 'unfollow') {
     exit();
 }
 
+if ($action === 'delete') {
+    $post_id = $target_id;
+
+    if (!post_exists($conn, $post_id)) {
+        http_response_code(400);
+        echo json_encode(['error' => 'invalid post id']);
+        exit();
+    }
+
+    // Check if the user owns the post
+    $stmt = $conn->prepare("SELECT user_id FROM posts WHERE id = ?");
+    $stmt->bind_param("i", $post_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $post = $result->fetch_assoc();
+    $stmt->close();
+
+    if ($post['user_id'] !== $user_id) {
+        http_response_code(403);
+        echo json_encode(['error' => 'unauthorized']);
+        exit();
+    }
+
+    // Delete the post
+    $stmt = $conn->prepare("DELETE FROM posts WHERE id = ?");
+    $stmt->bind_param("i", $post_id);
+    $success = $stmt->execute();
+    $stmt->close();
+
+    if (!$success) {
+        http_response_code(500);
+        echo json_encode(['error' => 'failed to delete post']);
+        exit();
+    }
+
+    echo json_encode(['success' => true]);
+    exit();
+}
+
 http_response_code(400);
 echo json_encode(['error' => 'invalid action']);
 exit();
