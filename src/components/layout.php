@@ -23,31 +23,6 @@ function render_header($title) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <link rel="stylesheet" href="../assets/css/common.css">
-
-
-    <style>
-        :root {
-            --gray-900: #101010; 
-            --gray-800: #202020;
-            --gray-700: #404040;
-            --gray-600: #606060;
-            --gray-500: #808080;
-            --gray-400: #c0c0c0;
-            --gray-300: #e0e0e0;
-            --gray-200: #f0f0f0;
-            --gray-100: #ffffff;
-            --blue: #4895ef;
-            --red: #ff6f61;
-        }
-
-        body, html {
-            font-family: 'Outfit', sans-serif;
-            height: 100%;
-            margin: 0;
-            background-color: var(--gray-900);
-            color: var(--gray-100) !important;
-        }
-    </style>
 </head>
 <body>
 <?php
