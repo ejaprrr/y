@@ -122,6 +122,11 @@ a:hover {
   color: var(--gray-500);
 }
 
+.default-avatar > i {
+  font-size: 3rem;
+  color: var(--gray-500);
+}
+
 .profile-picture {
   width: 40px;
   height: 40px;
@@ -138,6 +143,10 @@ textarea {
 }
 
 .links-wrapper * {
+  color: var(--gray-500);
+}
+
+.links-wrapper > * {
   color: var(--gray-500);
 }
 

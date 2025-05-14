@@ -25,6 +25,10 @@
   font-size: 1.2rem;
 }
 
+.action-btn > i {
+  font-size: 1.2rem;
+}
+
 .bi-heart {
   color: var(--gray-200);
 }

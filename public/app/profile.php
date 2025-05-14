@@ -57,7 +57,7 @@ $active_tab = isset($_GET['tab']) ? sanitize_input($_GET['tab']) : 'posts';
 
 <link rel="stylesheet" href="../assets/css/pages/app.css">
 <link rel="stylesheet" href="../assets/css/components/post.css">
-<link rel="stylesheet" href="../assets/css/components/hashtag.css">
+<link rel="stylesheet" href="../assets/css/components/empty-state.css">
 <link rel="stylesheet" href="../assets/css/components/left-sidebar.css">
 <link rel="stylesheet" href="../assets/css/components/right-sidebar.css">
 <link rel="stylesheet" href="../assets/css/components/page-header.css">

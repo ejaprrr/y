@@ -32,8 +32,16 @@ if (empty($tag)) {
     redirect("feed.php");
 }
 
-// Get posts with this hashtag
-$posts = get_posts_by_hashtag($conn, $tag);
+// Determine active tab (default to 'latest')
+$active_tab = isset($_GET['tab']) ? sanitize_input($_GET['tab']) : 'latest';
+
+// Fetch posts based on the active tab
+if ($active_tab === 'most_liked') {
+    $posts = get_posts_by_hashtag_sorted($conn, $tag, 'like_count');
+} else {
+    $posts = get_posts_by_hashtag_sorted($conn, $tag, 'created_at');
+}
+
 $post_count = get_hashtag_post_count($conn, $tag);
 
 ?>
@@ -42,10 +50,9 @@ $post_count = get_hashtag_post_count($conn, $tag);
 
 <link rel="stylesheet" href="../assets/css/pages/app.css">
 <link rel="stylesheet" href="../assets/css/components/post.css">
-<link rel="stylesheet" href="../assets/css/components/hashtag.css">
 <link rel="stylesheet" href="../assets/css/components/left-sidebar.css">
 <link rel="stylesheet" href="../assets/css/components/right-sidebar.css">
-<link rel="stylesheet" href="../assets/css/components/app/empty-state.css">
+<link rel="stylesheet" href="../assets/css/components/empty-state.css">
 <link rel="stylesheet" href="../assets/css/components/page-header.css">
 
 <div class="d-flex">
@@ -53,19 +60,32 @@ $post_count = get_hashtag_post_count($conn, $tag);
 
     <div class="main-content">
         <?php 
-            // Render page header
+            // Define tabs
+            $hashtag_tabs = [
+                [
+                    'label' => 'latest',
+                    'url' => '?tag=' . htmlspecialchars($tag) . '&tab=latest',
+                    'active' => $active_tab === 'latest'
+                ],
+                [
+                    'label' => 'popular',
+                    'url' => '?tag=' . htmlspecialchars($tag) . '&tab=most_liked',
+                    'active' => $active_tab === 'most_liked'
+                ]
+            ];
+
+            // Render page header with tabs
             render_page_header(
                 '#' . htmlspecialchars($tag),
                 number_format($post_count) . ' posts',
                 'feed.php',
-                []
+                $hashtag_tabs
             );
         ?>
         
         <div class="posts mx-3 my-3">
             <!-- render posts / empty state -->
             <?php if (!empty($posts)): ?>
-                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
                 <?php foreach ($posts as $post): ?>
                     <?php render_post($post, $conn); ?> 
                 <?php endforeach; ?>
@@ -81,11 +101,10 @@ $post_count = get_hashtag_post_count($conn, $tag);
         </div>
     </div>
 
-    <!-- Right sidebar -->
+    <!-- right sidebar -->
     <?php render_right_sidebar(); ?> 
 </div>
 
-<!-- AJAX -->
 <script src="../assets/js/interaction.js"></script>
 
 <?php render_footer(); ?>

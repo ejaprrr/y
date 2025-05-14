@@ -53,8 +53,13 @@ function get_trending_hashtags($conn, $limit = 3) {
     return $trending;
 }
 
-// Get posts by hashtag
-function get_posts_by_hashtag($conn, $hashtag) {
+// Get posts by hashtag with sorting
+function get_posts_by_hashtag_sorted($conn, $hashtag, $sort_by = 'created_at') {
+    $valid_sort_columns = ['created_at', 'like_count'];
+    if (!in_array($sort_by, $valid_sort_columns)) {
+        $sort_by = 'created_at';
+    }
+
     $sql = "SELECT posts.*, users.username, users.display_name, users.profile_picture,
             (SELECT COUNT(*) FROM likes WHERE post_id = posts.id) AS like_count,
             EXISTS(SELECT 1 FROM likes WHERE post_id = posts.id AND user_id = ?) AS is_liked
@@ -62,7 +67,7 @@ function get_posts_by_hashtag($conn, $hashtag) {
             JOIN users ON posts.user_id = users.id
             JOIN hashtags ON posts.id = hashtags.post_id
             WHERE hashtags.hashtag = ?
-            ORDER BY posts.created_at DESC";
+            ORDER BY $sort_by DESC";
             
     $stmt = $conn->prepare($sql);
     $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0;

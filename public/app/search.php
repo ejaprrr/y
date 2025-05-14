@@ -14,27 +14,27 @@ require_once "../../src/components/app/left-sidebar.php";
 require_once "../../src/components/app/right-sidebar.php";
 require_once "../../src/components/app/page-header.php";
 
-// Authentication check
+// authentication check
 if (!check_login()) {
     redirect("../auth/log-in.php");
 }
 
-// Set CSRF token
+// set CSRF token
 set_csrf_token();
 
-// Get user information
+// get user information
 $user = get_user($conn, $_SESSION['user_id']);
 
-// Get users that current user follows (for the dropdown)
+// get users that current user follows (for the dropdown)
 $followed_users = get_followed_users($conn, $user['id']);
 
-// Initialize variables
+// initialize variables
 $search_results = [];
 $error = '';
 $message = '';
 $total_results = 0;
 
-// Default search values
+// default search values
 $default_values = [
     'keyword' => '',
     'exclude_keyword' => '',
@@ -47,9 +47,9 @@ $default_values = [
     'followed_users' => []
 ];
 
-// Handle search
+// handle search
 if ($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET['keyword'])) {
-    // Quick search from right sidebar
+    // quick search from right sidebar
     $keyword = sanitize_input($_GET['keyword']);
     if (!empty($keyword)) {
         $search_results = perform_search($conn, [
@@ -60,17 +60,17 @@ if ($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET['keyword'])) {
         $total_results = count($search_results);
     }
     
-    // Store the search term for form
+    // store the search term for form
     $default_values['keyword'] = $keyword;
 }
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    // Check CSRF token
+    // check CSRF token
     $valid = check_csrf_token();
     if (!$valid) {
         $error = "invalid CSRF token";
     } else {
-        // Get search parameters
+        // get search parameters
         $search_params = [
             'keyword' => sanitize_input($_POST['keyword'] ?? ''),
             'exclude_keyword' => sanitize_input($_POST['exclude_keyword'] ?? ''),
@@ -83,10 +83,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             'followed_users' => isset($_POST['followed_users']) ? $_POST['followed_users'] : []
         ];
         
-        // Store the form values for repopulation
+        // store the form values for repopulation
         $default_values = $search_params;
         
-        // Perform search if keyword provided
+        // perform search if keyword provided
         if (!empty($search_params['keyword']) || !empty($search_params['followed_users'])) {
             $search_results = perform_search($conn, $search_params, $user['id']);
             $total_results = count($search_results);
@@ -102,10 +102,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 <link rel="stylesheet" href="../assets/css/pages/app.css">
 <link rel="stylesheet" href="../assets/css/components/post.css">
-<link rel="stylesheet" href="../assets/css/components/hashtag.css">
 <link rel="stylesheet" href="../assets/css/components/left-sidebar.css">
 <link rel="stylesheet" href="../assets/css/components/right-sidebar.css">
-<link rel="stylesheet" href="../assets/css/components/app/empty-state.css">
+<link rel="stylesheet" href="../assets/css/components/empty-state.css">
 <link rel="stylesheet" href="../assets/css/components/page-header.css">
 <link rel="stylesheet" href="../assets/css/pages/search.css">
 
@@ -266,11 +265,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </div>
     </div>
 
-    <!-- Right sidebar -->
+    <!-- right sidebar -->
     <?php render_right_sidebar(); ?> 
 </div>
 
-<!-- Include interaction.js for like functionality -->
+<!-- include interaction.js for like functionality -->
 <script src="../assets/js/interaction.js"></script>
 
 <?php render_footer(); ?>

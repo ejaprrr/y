@@ -22,6 +22,10 @@
   color: var(--gray-200) !important;
 }
 
+.left-sidebar > nav > a {
+  color: var(--gray-200) !important;
+}
+
 /* Navigation styles */
 .left-sidebar .active {
   background-color: var(--gray-700);

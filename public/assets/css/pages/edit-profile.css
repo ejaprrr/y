@@ -68,6 +68,11 @@
   color: var(--gray-500);
 }
 
+.profile-picture-edit-default > i {
+  font-size: 3rem;
+  color: var(--gray-500);
+}
+
 .profile-picture-overlay {
   position: absolute;
   top: 0;
@@ -99,6 +104,13 @@
   padding: 0.75rem 1rem;
 }
 
+.profile-form-fields > .form-control {
+  background-color: var(--gray-800);
+  border: 1px solid var(--gray-600);
+  color: var(--gray-100);
+  padding: 0.75rem 1rem;
+}
+
 .profile-form-fields .form-control:focus {
   border-color: var(--blue);
   box-shadow: 0 0 0 0.25rem rgba(72, 149, 239, 0.25);
@@ -112,5 +124,9 @@
 
 /* Empty state styling */
 .empty-state i {
+  color: var(--gray-600);
+}
+
+.empty-state > i {
   color: var(--gray-600);
 }

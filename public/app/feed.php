@@ -72,11 +72,10 @@ if ($active_tab === 'following') {
 
 <link rel="stylesheet" href="../assets/css/pages/app.css">
 <link rel="stylesheet" href="../assets/css/components/post.css">
-<link rel="stylesheet" href="../assets/css/components/hashtag.css">
 <link rel="stylesheet" href="../assets/css/components/left-sidebar.css">
 <link rel="stylesheet" href="../assets/css/components/right-sidebar.css">
 <link rel="stylesheet" href="../assets/css/components/post-composer.css">
-<link rel="stylesheet" href="../assets/css/components/app/empty-state.css">
+<link rel="stylesheet" href="../assets/css/components/empty-state.css">
 <link rel="stylesheet" href="../assets/css/components/page-header.css">
 
 <div class="d-flex">
