@@ -31,7 +31,7 @@ function render_post($post, $conn) {
 
     <!-- post content with hashtags highlighted -->
     <div class="mb-3">
-        <?= format_content_with_hashtags(nl2br(htmlspecialchars($post['content']))) ?>
+        <?= format_content_with_hashtags(nl2br(htmlspecialchars_decode($post['content']))) ?>
     </div>
 
     <!-- actions and stats -->
