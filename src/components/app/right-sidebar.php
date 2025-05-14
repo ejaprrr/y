@@ -1,35 +1,42 @@
 <?php
+require_once "../../src/functions/hashtag.php";
+
 function render_right_sidebar() {
+    global $conn;
+    $trending_hashtags = get_trending_hashtags($conn, 3);
 ?>
 <div class="right-sidebar d-flex flex-column">
     <div class="p-3">
         <div class="card rounded-4 mb-4">
             <div class="p-3">
-                <h3 class="fs-5 mb-3">trends for you</h3>
+                <h3 class="fs-5 mb-3">trending hashtags</h3>
                 <div>
-                    <div class="mb-3 pb-2 separator">
-                        <small>trending worldwide</small>
-                        <div class="fw-bold">#ExampleTrend1</div>
-                        <small>10.5K posts</small>
-                    </div>
-                    <div class="mb-3 pb-2 separator">
-                        <small>technology</small>
-                        <div class="fw-bold">#ExampleTrend2</div>
-                        <small>5.2K posts</small>
-                    </div>
-                    <div class="mb-3"></div>
-                        <small>entertainment</small>
-                        <div class="fw-bold">#ExampleTrend3</div>
-                        <small>3.7K posts</small>
-                    </div>
+                    <?php if (!empty($trending_hashtags)): ?>
+                        <?php foreach ($trending_hashtags as $index => $trend): ?>
+                            <a href="../app/hashtag.php?tag=<?= htmlspecialchars($trend['hashtag']) ?>" class="hashtag-link text-decoration-none">
+                                <div class="hover-highlight p-3 rounded-3 <?= $index < count($trending_hashtags) - 1 ? 'mb-1' : '' ?>">
+                                    <div class="fw-bold">
+                                        #<?= htmlspecialchars($trend['hashtag']) ?>
+                                    </div>
+                                    <small><?= number_format($trend['count']) ?> posts</small>
+                                </div>
+                            </a>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="mb-3 pb-2 separator">
+                            <div class="fw-bold">#notrendsyet</div>
+                            <small>be the first to create a trend!</small>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
+        
         <div class="links-wrapper d-flex w-100 mt-auto gap-3 justify-content-center">
-        <a href="../about/home.php" class="d-block mb-3 text-lowercase">home</a>
-        <a href="../about/about-us.php" class="d-block mb-3 text-lowercase">about us</a>
-        <span class="mb-3">&copy; Y, 2025</span>
-    </div>
+            <a href="../about/home.php" class="d-block mb-3 text-lowercase">home</a>
+            <a href="../about/about-us.php" class="d-block mb-3 text-lowercase">about us</a>
+            <span class="mb-3">&copy; Y, 2025</span>
+        </div>
     </div>
 </div>
 <?php

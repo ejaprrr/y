@@ -24,10 +24,15 @@ function add_post($conn, $username, $content) {
         // Now insert the post with user_id
         $stmt = $conn->prepare("INSERT INTO posts (user_id, content) VALUES (?, ?)");
         $stmt->bind_param("is", $user_id, $content);
-        $success = $stmt->execute();
-        $stmt->close();
-
-        if ($success) {
+        
+        // Execute the insertion
+        if ($stmt->execute()) {
+            $post_id = $stmt->insert_id;
+            $stmt->close();
+            
+            // Save hashtags for the post
+            save_hashtags($conn, $post_id, $content);
+            
             return true;
         }
     }
@@ -45,6 +50,29 @@ function get_posts($conn) {
     $posts = $result->fetch_all(MYSQLI_ASSOC);
 
     $stmt->close();
+    return $posts;
+}
+
+function get_following_posts($conn, $user_id) {
+    $sql = "SELECT p.*, u.username, u.display_name, u.profile_picture,
+            (SELECT COUNT(*) FROM likes WHERE post_id = p.id) AS like_count,
+            EXISTS(SELECT 1 FROM likes WHERE post_id = p.id AND user_id = ?) AS is_liked
+            FROM posts p
+            JOIN users u ON p.user_id = u.id
+            JOIN follows f ON p.user_id = f.followed_id
+            WHERE f.follower_id = ?
+            ORDER BY p.created_at DESC";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $user_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    $posts = [];
+    while ($row = $result->fetch_assoc()) {
+        $posts[] = $row;
+    }
+    
     return $posts;
 }
 ?>

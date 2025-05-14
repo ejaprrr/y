@@ -1,0 +1,93 @@
+<?php
+
+// Extract hashtags from content
+function extract_hashtags($content) {
+    $hashtags = [];
+    preg_match_all('/#(\w+)/', $content, $matches);
+    if (!empty($matches[1])) {
+        $hashtags = array_unique($matches[1]);
+    }
+    return $hashtags;
+}
+
+// Save hashtags for a post
+function save_hashtags($conn, $post_id, $content) {
+    $hashtags = extract_hashtags($content);
+    
+    foreach ($hashtags as $hashtag) {
+        $stmt = $conn->prepare("INSERT IGNORE INTO hashtags (post_id, hashtag) VALUES (?, ?)");
+        $stmt->bind_param("is", $post_id, $hashtag);
+        $stmt->execute();
+        $stmt->close();
+    }
+    
+    return count($hashtags);
+}
+
+// Get trending hashtags
+function get_trending_hashtags($conn, $limit = 3) {
+    $past_week = date('Y-m-d H:i:s', strtotime('-7 days'));
+    
+    $sql = "SELECT hashtag, COUNT(*) as count 
+            FROM hashtags 
+            WHERE created_at > ? 
+            GROUP BY hashtag 
+            ORDER BY count DESC, created_at DESC 
+            LIMIT ?";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("si", $past_week, $limit);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    $trending = [];
+    while ($row = $result->fetch_assoc()) {
+        $trending[] = $row;
+    }
+    
+    $stmt->close();
+    return $trending;
+}
+
+// Get posts by hashtag
+function get_posts_by_hashtag($conn, $hashtag) {
+    $sql = "SELECT p.*, u.username, u.display_name, u.profile_picture,
+            (SELECT COUNT(*) FROM likes WHERE post_id = p.id) AS like_count,
+            EXISTS(SELECT 1 FROM likes WHERE post_id = p.id AND user_id = ?) AS is_liked
+            FROM posts p
+            JOIN users u ON p.user_id = u.id
+            JOIN hashtags h ON p.id = h.post_id
+            WHERE h.hashtag = ?
+            ORDER BY p.created_at DESC";
+            
+    $stmt = $conn->prepare($sql);
+    $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0;
+    $stmt->bind_param("is", $user_id, $hashtag);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    $posts = [];
+    while ($row = $result->fetch_assoc()) {
+        $posts[] = $row;
+    }
+    
+    $stmt->close();
+    return $posts;
+}
+
+// Get hashtag post count
+function get_hashtag_post_count($conn, $hashtag) {
+    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM hashtags WHERE hashtag = ?");
+    $stmt->bind_param("s", $hashtag);
+    $stmt->execute();
+    $result = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+    
+    return $result['count'] ?? 0;
+}
+
+// Format post content to highlight hashtags
+function format_content_with_hashtags($content) {
+    return preg_replace('/#(\w+)/', '<a href="../app/hashtag.php?tag=$1" class="hashtag">#$1</a>', $content);
+}
+?>

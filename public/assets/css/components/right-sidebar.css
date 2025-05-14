@@ -14,3 +14,11 @@
 .separator {
   border-bottom: 1px solid var(--gray-700);
 }
+
+.hashtag-link {
+  color: var(--gray-100);
+}
+
+.hashtag-link:hover {
+  color: var(--gray-100);
+}

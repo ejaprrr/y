@@ -1,13 +1,15 @@
 <?php
 
-function render_page_header($title, $subtitle = '', $back_url = 'feed.php', $tabs = [], $is_sticky = true) {
+function render_page_header($title, $subtitle = '', $back_url = '', $tabs = [], $is_sticky = true) {
     $header_class = $is_sticky ? 'sticky-header' : '';
 ?>
     <div class="<?= $header_class ?>">
         <div class="profile-header-bar d-flex align-items-center p-3 border-bottom" style="border-color: var(--gray-700) !important;">
-            <a href="<?= htmlspecialchars($back_url) ?>" class="text-decoration-none text-white me-3">
-                <i class="bi bi-arrow-left fs-4"></i>
-            </a>
+            <?php if (!empty($back_url)): ?>
+                <a href="<?= htmlspecialchars($back_url) ?>" class="text-decoration-none text-white me-3">
+                    <i class="bi bi-arrow-left fs-4"></i>
+                </a>
+            <?php endif; ?>
             <div>
                 <h3 class="m-0 fw-bold"><?= htmlspecialchars($title) ?></h3>
                 <?php if (!empty($subtitle)): ?>

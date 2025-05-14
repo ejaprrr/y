@@ -1,21 +1,25 @@
 <?php
 require_once "../../src/functions/connection.php";
-require_once "../../src/functions/helpers.php";
 require_once "../../src/functions/auth.php";
-require_once "../../src/functions/post.php";
+require_once "../../src/functions/helpers.php";
 require_once "../../src/functions/validation.php";
+require_once "../../src/functions/post.php";
 require_once "../../src/functions/user.php";
-require_once "../../src/components/post.php";
 require_once "../../src/components/layout.php";
+require_once "../../src/components/post.php";
+require_once "../../src/components/empty-state.php";
 require_once "../../src/components/app/left-sidebar.php";
 require_once "../../src/components/app/right-sidebar.php";
+require_once "../../src/components/app/page-header.php";
 require_once "../../src/components/app/composer.php";
-require_once "../../src/components/empty-state.php";
 
 // authentication check
 if (!check_login()) {
     redirect("../auth/log-in.php");
 }
+
+// upload base directory
+$upload_base = realpath(__DIR__ . "/../uploads");
 
 // set CSRF token
 set_csrf_token();
@@ -23,7 +27,10 @@ set_csrf_token();
 // get user information
 $user = get_user($conn, $_SESSION['user_id']);
 
-// handle post creation
+// determine active tab
+$active_tab = isset($_GET['tab']) && $_GET['tab'] === 'following' ? 'following' : 'latest';
+
+// check if form was submitted
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // check CSRF token
     $valid = check_csrf_token();
@@ -51,24 +58,50 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 }
 
-// get posts
-$posts = get_posts($conn);
+// get posts based on active tab
+if ($active_tab === 'following') {
+    $posts = get_following_posts($conn, $user['id']);
+} else {
+    $posts = get_posts($conn);
+}
 ?>
 
 <?php render_header("feed"); ?>
 
 <link rel="stylesheet" href="../assets/css/pages/app.css">
 <link rel="stylesheet" href="../assets/css/components/post.css">
+<link rel="stylesheet" href="../assets/css/components/hashtag.css">
 <link rel="stylesheet" href="../assets/css/components/left-sidebar.css">
 <link rel="stylesheet" href="../assets/css/components/right-sidebar.css">
 <link rel="stylesheet" href="../assets/css/components/composer.css">
 <link rel="stylesheet" href="../assets/css/components/empty-state.css">
+<link rel="stylesheet" href="../assets/css/components/page-header.css">
 
 <div class="d-flex">
     <?php render_left_sidebar($user); ?>
 
     <div class="main-content">
-        <?php render_composer(); ?>
+        <?php 
+            // Define tabs for the feed
+            $feed_tabs = [
+                [
+                    'label' => 'latest',
+                    'url' => 'feed.php?tab=latest',
+                    'active' => $active_tab === 'latest'
+                ],
+                [
+                    'label' => 'following',
+                    'url' => 'feed.php?tab=following',
+                    'active' => $active_tab === 'following'
+                ]
+            ];
+            
+            // Render page header with tabs
+            render_page_header('feed', 'browse posts and engage with content!', '', $feed_tabs);
+            
+            // Render composer
+            render_composer();
+        ?>
         
         <div class="posts mx-3">
             <!-- render posts / empty state -->
@@ -77,11 +110,17 @@ $posts = get_posts($conn);
                     <?php render_post($post, $conn); ?> 
                 <?php endforeach; ?>
             <?php else: ?>
-                <?php render_empty_state(
-                    'file-earmark-text', 
-                    'no posts yet', 
-                    'be the first one to post!',
-                ); ?>
+                <?php 
+                    $message = $active_tab === 'following' 
+                        ? 'you\'re not following anyone who has posted yet!' 
+                        : 'be the first one to post!';
+                    
+                    render_empty_state(
+                        'file-earmark-text', 
+                        'no posts yet', 
+                        $message
+                    ); 
+                ?>
             <?php endif; ?>
         </div>
     </div>

@@ -3,6 +3,7 @@
 require_once '../../src/functions/like.php';
 require_once '../../src/functions/user.php';
 require_once '../../src/functions/helpers.php';
+require_once '../../src/functions/hashtag.php';
 require_once 'app/profile-picture.php';
 
 function render_post($post, $conn) {
@@ -28,9 +29,9 @@ function render_post($post, $conn) {
         </div>
     </div>
 
-    <!-- post content -->
+    <!-- post content with hashtags highlighted -->
     <div class="mb-3">
-        <?= nl2br(htmlspecialchars($post['content'])) ?>
+        <?= format_content_with_hashtags(nl2br(htmlspecialchars($post['content']))) ?>
     </div>
 
     <!-- actions and stats -->
