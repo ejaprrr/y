@@ -12,41 +12,41 @@ require_once "../../src/components/auth/container.php";
 start_session();
 set_csrf_token();
 
-$error_message = '';
+$error = '';
 $error_field = '';
 
 // handle sign up
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $valid = check_csrf_token();
     if (!$valid) {
-        $error_message = "invalid CSRF token";
+        $error = "invalid CSRF token";
     } else {
         $username = sanitize_username($_POST['username'] ?? '');
         $password = $_POST['password'] ?? '';
 
         $username_validation = validate_username($username);
         if ($username_validation !== true) {
-            $error_message = $username_validation;
+            $error = $username_validation;
             $error_field = 'username';
         } else {
             $user_exists = username_exists($conn, $username);
             if ($user_exists) {
-                $error_message = "username already exists";
+                $error = "username already exists";
                 $error_field = 'username';
             } else {
                 $password_validation = validate_password($password);
                 if ($password_validation !== true) {
-                    $error_message = $password_validation;
+                    $error = $password_validation;
                     $error_field = 'password';
                 } else {
                     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
                     $user_id = add_user($conn, $username, $hashed_password);
                     if ($user_id) {
-                        session_regenerate_id(true); // Regenerate session ID to prevent fixation
+                        session_regenerate_id(true);
                         $_SESSION['user_id'] = $user_id;
                         redirect('../app/feed.php');
                     } else {
-                        $error_message = "error creating user";
+                        $error = "error creating user";
                     }
                 }
             }
@@ -66,10 +66,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <?php render_sidebar(); ?>
     <?php render_container_start("hey there!", "start by creating an account."); ?>
 
-    <?php if (!empty($error_message)): ?>
-        <div class="form-text text-danger mb-4 w-100 text-center">
-            <span><?= htmlspecialchars($error_message) ?></span>
-        </div>
+    <?php if (!empty($error)): ?>
+        <div class="alert alert-danger m-3"><?= $error ?></div>
     <?php endif; ?>
 
     <form method="POST">

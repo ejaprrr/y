@@ -11,13 +11,13 @@ require_once "../../src/components/auth/container.php";
 start_session();
 set_csrf_token();
 
-$error_message = '';
+$error = '';
 
 // handle log in
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $valid = check_csrf_token();
     if (!$valid) {
-        $error_message = "invalid CSRF token";
+        $error = "invalid CSRF token";
     } else {
         $username = sanitize_username($_POST['username'] ?? '');
         $password = $_POST['password'] ?? '';
@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['user_id'] = $user_id;
             redirect('../app/feed.php');
         } else {
-            $error_message = "invalid username or password";
+            $error = "invalid username or password";
         }
     }
 }
@@ -46,10 +46,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <?php render_sidebar(); ?>
     <?php render_container_start("welcome back!", "log back into your account."); ?>
 
-    <?php if (!empty($error_message)): ?>
-        <div class="form-text text-danger mb-4 w-100 text-center">
-            <span><?= htmlspecialchars($error_message) ?></span>
-        </div>
+    <?php if (!empty($error)): ?>
+        <div class="alert alert-danger m-3"><?= $error ?></div>
     <?php endif; ?>
 
     <form method="POST">
