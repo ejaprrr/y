@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Handle like/unlike
+  // handle like/unlike
   document.querySelectorAll(".like-btn").forEach((btn) => {
     btn.addEventListener("click", function () {
       const postDiv = this.closest(".card");
@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Handle follow/unfollow
+  // handle follow/unfollow
   document.querySelectorAll(".follow-btn").forEach((btn) => {
     btn.addEventListener("click", function () {
       const userId = this.getAttribute("data-user-id");

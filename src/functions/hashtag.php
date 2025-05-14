@@ -5,7 +5,9 @@ function extract_hashtags($content) {
     $hashtags = [];
     preg_match_all('/#(\w+)/', $content, $matches);
     if (!empty($matches[1])) {
-        $hashtags = array_unique($matches[1]);
+        $hashtags = array_filter(array_unique($matches[1]), function($hashtag) {
+            return strlen($hashtag) <= 24; // Limit hashtags to 24 characters
+        });
     }
     return $hashtags;
 }
@@ -15,10 +17,12 @@ function save_hashtags($conn, $post_id, $content) {
     $hashtags = extract_hashtags($content);
     
     foreach ($hashtags as $hashtag) {
-        $stmt = $conn->prepare("INSERT IGNORE INTO hashtags (post_id, hashtag) VALUES (?, ?)");
-        $stmt->bind_param("is", $post_id, $hashtag);
-        $stmt->execute();
-        $stmt->close();
+        if (strlen($hashtag) <= 24) { // Ensure hashtag length is valid
+            $stmt = $conn->prepare("INSERT IGNORE INTO hashtags (post_id, hashtag) VALUES (?, ?)");
+            $stmt->bind_param("is", $post_id, $hashtag);
+            $stmt->execute();
+            $stmt->close();
+        }
     }
     
     return count($hashtags);
@@ -88,6 +92,11 @@ function get_hashtag_post_count($conn, $hashtag) {
 
 // Format post content to highlight hashtags
 function format_content_with_hashtags($content) {
-    return preg_replace('/#(\w+)/', '<a href="../app/hashtag.php?tag=$1" class="hashtag">#$1</a>', $content);
+    return preg_replace_callback('/#(\w+)/', function ($matches) {
+        if (strlen($matches[1]) <= 24) { // Only highlight hashtags <= 24 chars
+            return '<a href="../app/hashtag.php?tag=' . htmlspecialchars($matches[1]) . '" class="hashtag">#' . htmlspecialchars($matches[1]) . '</a>';
+        }
+        return '#' . htmlspecialchars($matches[1]); // Leave longer hashtags as plain text
+    }, $content);
 }
 ?>

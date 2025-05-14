@@ -40,8 +40,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $bio = sanitize_input($_POST['bio'] ?? '');
         
         // basic validation
-        if (strlen($display_name) > 24) {
-            $error = "display name is too long (maximum 24 characters)";
+        if (strlen($display_name) > 48) {
+            $error = "display name is too long (maximum 48 characters)";
         } elseif (strlen($bio) > 128) {
             $error = "bio is too long (maximum 128 characters)";
         } else {
@@ -187,8 +187,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         <label for="display_name" class="form-label fw-bold">display name</label>
                         <input type="text" class="form-control rounded-3" id="display_name" name="display_name" 
                                value="<?= htmlspecialchars($user['display_name'] ?? $user['username']) ?>" 
-                               maxlength="24" required>
-                        <div>your name as displayed on your profile (24 characters max)</div>
+                               maxlength="48" required>
+                        <div>your name as displayed on your profile (48 characters max)</div>
                     </div>
                     
                     <div class="mb-3">
@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const saveButton = profileForm.querySelector('button[type="submit"]');
     
     // Max allowed characters
-    const MAX_DISPLAY_NAME_LENGTH = 24;
+    const MAX_DISPLAY_NAME_LENGTH = 48;
     const MAX_BIO_LENGTH = 128;
     
     // Function to validate the form and update button state
