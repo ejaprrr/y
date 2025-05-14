@@ -12,19 +12,19 @@ function render_left_sidebar($user) {
     <nav class="px-3">
         <div class="d-flex flex-column gap-3">
             <div>
-                <a href="feed.php" class="d-flex align-items-center text-decoration-none fs-5 py-2 px-3 rounded-3 hover-highlight <?= basename($_SERVER['PHP_SELF']) === 'feed.php' ? 'active' : '' ?>">
+                <a href="feed.php?origin=<?= get_clean_url() ?>" class="d-flex align-items-center text-decoration-none fs-5 py-2 px-3 rounded-3 hover-highlight <?= basename($_SERVER["PHP_SELF"]) === "feed.php" ? "active" : "" ?>">
                     <i class="bi bi-house-fill me-3"></i>
                     feed
                 </a>
             </div>
             <div>
-                <a href="profile.php" class="d-flex align-items-center text-decoration-none fs-5 py-2 px-3 rounded-3 hover-highlight <?= basename($_SERVER['PHP_SELF']) === 'profile.php' || basename($_SERVER['PHP_SELF']) === 'edit-profile.php' ? 'active' : '' ?>">
+                <a href="profile.php?origin=<?= get_clean_url() ?>" class="d-flex align-items-center text-decoration-none fs-5 py-2 px-3 rounded-3 hover-highlight <?= basename($_SERVER["PHP_SELF"]) === "profile.php" || basename($_SERVER["PHP_SELF"]) === "edit-profile.php" ? "active" : "" ?>">
                     <i class="bi bi-person-fill me-3"></i>
                     profile
                 </a>
             </div>
             <div>
-                <a href="search.php" class="d-flex align-items-center text-decoration-none fs-5 py-2 px-3 rounded-3 hover-highlight <?= basename($_SERVER['PHP_SELF']) === 'search.php' ? 'active' : '' ?>">
+                <a href="search.php?origin=<?= get_clean_url() ?>" class="d-flex align-items-center text-decoration-none fs-5 py-2 px-3 rounded-3 hover-highlight <?= basename($_SERVER["PHP_SELF"]) === "search.php" ? "active" : "" ?>">
                     <i class="bi bi-search me-3"></i>
                     search
                 </a>

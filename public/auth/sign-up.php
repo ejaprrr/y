@@ -12,8 +12,8 @@ require_once "../../src/components/auth/form-container.php";
 start_session();
 set_csrf_token();
 
-$error = '';
-$error_field = '';
+$error = "";
+$error_field = "";
 
 // handle sign up
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -21,30 +21,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!$valid) {
         $error = "invalid CSRF token";
     } else {
-        $username = sanitize_username($_POST['username'] ?? '');
-        $password = $_POST['password'] ?? '';
+        $username = sanitize_username($_POST["username"] ?? "");
+        $password = $_POST["password"] ?? "";
 
         $username_validation = validate_username($username);
         if ($username_validation !== true) {
             $error = $username_validation;
-            $error_field = 'username';
+            $error_field = "username";
         } else {
             $user_exists = username_exists($conn, $username);
             if ($user_exists) {
                 $error = "username already exists";
-                $error_field = 'username';
+                $error_field = "username";
             } else {
                 $password_validation = validate_password($password);
                 if ($password_validation !== true) {
                     $error = $password_validation;
-                    $error_field = 'password';
+                    $error_field = "password";
                 } else {
                     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
                     $user_id = add_user($conn, $username, $hashed_password);
                     if ($user_id) {
                         session_regenerate_id(true);
-                        $_SESSION['user_id'] = $user_id;
-                        redirect('../app/feed.php');
+                        $_SESSION["user_id"] = $user_id;
+                        redirect("../app/feed.php");
                     } else {
                         $error = "error creating user";
                     }
@@ -73,21 +73,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <form method="POST">
         <div class="mb-4">
             <label for="username" class="mb-2">username</label>
-            <input type="text" class="form-control rounded-3 p-2 <?= ($error_field == 'username') ? 'is-invalid' : '' ?>" 
+            <input type="text" class="form-control rounded-3 p-2 <?= ($error_field == "username") ? "is-invalid" : "" ?>" 
                   id="username" name="username" placeholder="enter your username" required 
-                  value="<?= isset($_POST['username']) ? htmlspecialchars($_POST['username']) : '' ?>">
+                  value="<?= isset($_POST["username"]) ? htmlspecialchars($_POST["username"]) : "" ?>">
             <div id="username-feedback" class="form-text"></div>
         </div>
         <div class="mb-4">
             <label for="password" class="mb-2">password</label>
-            <input type="password" class="form-control rounded-3 p-2 <?= ($error_field == 'password') ? 'is-invalid' : '' ?>" 
+            <input type="password" class="form-control rounded-3 p-2 <?= ($error_field == "password") ? "is-invalid" : "" ?>" 
                   id="password" name="password" placeholder="enter a strong password" required>
             <div id="password-strength-bar" class="progress mt-2" style="height: 5px; background-color: var(--bs-gray-700);">
                 <div id="password-strength-progress" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
             <div id="password-feedback" class="form-text mt-1"></div>
         </div>
-        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION["csrf_token"]) ?>">
         <div class="d-grid mt-4">
             <button type="submit" class="btn btn-primary rounded-3 p-2 fw-semibold" disabled>sign up</button>
         </div>

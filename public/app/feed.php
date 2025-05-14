@@ -18,8 +18,8 @@ if (!check_login()) {
     redirect("../auth/log-in.php");
 }
 // initialize variables
-$message = '';
-$error = '';
+$message = "";
+$error = "";
 
 // upload base directory
 $upload_base = realpath(__DIR__ . "/../uploads");
@@ -28,10 +28,10 @@ $upload_base = realpath(__DIR__ . "/../uploads");
 set_csrf_token();
 
 // get user information
-$user = get_user($conn, $_SESSION['user_id']);
+$user = get_user($conn, $_SESSION["user_id"]);
 
 // determine active tab
-$active_tab = isset($_GET['tab']) && $_GET['tab'] === 'following' ? 'following' : 'latest';
+$active_tab = isset($_GET["tab"]) && $_GET["tab"] === "following" ? "following" : "latest";
 
 // check if form was submitted
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $error = "invalid CSRF token";
     } else {
         // sanitize and validate content
-        $content = sanitize_post_content($_POST['content'] ?? '');
+        $content = sanitize_post_content($_POST["content"] ?? "");
         $content_validation = validate_post_content($content);
         
         if ($content_validation !== true) {
@@ -61,8 +61,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 
 // get posts based on active tab
-if ($active_tab === 'following') {
-    $posts = get_following_posts($conn, $user['id']);
+if ($active_tab === "following") {
+    $posts = get_following_posts($conn, $user["id"]);
 } else {
     $posts = get_posts($conn);
 }
@@ -86,20 +86,20 @@ if ($active_tab === 'following') {
             // Define tabs for the feed
             $feed_tabs = [
                 [
-                    'label' => 'latest',
-                    'url' => 'feed.php?tab=latest',
-                    'active' => $active_tab === 'latest'
+                    "label" => "latest",
+                    "url" => "feed.php?tab=latest",
+                    "active" => $active_tab === "latest"
                 ],
                 [
-                    'label' => 'following',
-                    'url' => 'feed.php?tab=following',
-                    'active' => $active_tab === 'following'
+                    "label" => "following",
+                    "url" => "feed.php?tab=following",
+                    "active" => $active_tab === "following"
                 ]
             ];
         ?>
 
         <!-- render page header + composer -->
-        <?= render_page_header('feed', 'browse posts and engage with content!', '', $feed_tabs); ?>
+        <?= render_page_header("feed", "browse posts and engage with content!", "", $feed_tabs); ?>
         <?= render_post_composer(); ?>
 
         <!-- messages and errors -->
@@ -119,13 +119,13 @@ if ($active_tab === 'following') {
                 <?php endforeach; ?>
             <?php else: ?>
                 <?php 
-                    $message = $active_tab === 'following' 
-                        ? 'you\'re not following anyone who has posted yet!' 
-                        : 'be the first one to post!';
+                    $message = $active_tab === "following" 
+                        ? "you're not following anyone who has posted yet!" 
+                        : "be the first one to post!";
                     
                     render_empty_state(
-                        'file-earmark-text', 
-                        'no posts yet', 
+                        "file-earmark-text", 
+                        "no posts yet", 
                         $message
                     ); 
                 ?>

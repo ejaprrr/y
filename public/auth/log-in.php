@@ -11,7 +11,7 @@ require_once "../../src/components/auth/form-container.php";
 start_session();
 set_csrf_token();
 
-$error = '';
+$error = "";
 
 // handle log in
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -19,15 +19,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!$valid) {
         $error = "invalid CSRF token";
     } else {
-        $username = sanitize_username($_POST['username'] ?? '');
-        $password = $_POST['password'] ?? '';
+        $username = sanitize_username($_POST["username"] ?? "");
+        $password = $_POST["password"] ?? "";
 
         $user_id = verify_user($conn, $username, $password);
 
         if ($user_id) {
             session_regenerate_id(true);
-            $_SESSION['user_id'] = $user_id;
-            redirect('../app/feed.php');
+            $_SESSION["user_id"] = $user_id;
+            redirect("../app/feed.php");
         } else {
             $error = "invalid username or password";
         }
@@ -53,13 +53,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <form method="POST">
         <div class="mb-4">
             <label for="username" class="mb-2">username</label>
-            <input type="text" class="form-control rounded-3 p-2" id="username" name="username" placeholder="enter your username" required value="<?= isset($_POST['username']) ? htmlspecialchars($_POST['username']) : '' ?>">
+            <input type="text" class="form-control rounded-3 p-2" id="username" name="username" placeholder="enter your username" required value="<?= isset($_POST["username"]) ? htmlspecialchars($_POST["username"]) : "" ?>">
         </div>
         <div class="mb-4">
             <label for="password" class="mb-2">password</label>
             <input type="password" class="form-control rounded-3 p-2" id="password" name="password" placeholder="enter your password" required>
         </div>
-        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION["csrf_token"]) ?>">
         <div class="d-grid mt-4">
             <button type="submit" class="btn btn-primary rounded-3 p-2 fw-semibold" disabled>log in</button>
         </div>

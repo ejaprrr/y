@@ -7,10 +7,10 @@ function validate_username($username) {
     if (strlen($username) < 3 || strlen($username) > 24) {
         return "username must be between 3 and 24 characters";
     }
-    if (!preg_match('/^[a-z0-9_]+$/', $username)) {
+    if (!preg_match("/^[a-z0-9_]+$/", $username)) {
         return "username can only contain lowercase letters, numbers, and underscores";
     }
-    if ($username[0] === '_') {
+    if ($username[0] === "_") {
         return "username cannot start with an underscore";
     }
     return true;
@@ -23,16 +23,16 @@ function validate_password($password) {
     if (strlen($password) < 8) {
         return "password must be at least 8 characters long";
     }
-    if (!preg_match('/[a-z]/', $password)) {
+    if (!preg_match("/[a-z]/", $password)) {
         return "password must contain at least one lowercase letter";
     }
-    if (!preg_match('/[A-Z]/', $password)) {
+    if (!preg_match("/[A-Z]/", $password)) {
         return "password must contain at least one uppercase letter";
     }
-    if (!preg_match('/[0-9]/', $password)) {
+    if (!preg_match("/[0-9]/", $password)) {
         return "password must contain at least one number";
     }
-    if (!preg_match('/[\W_]/', $password)) {
+    if (!preg_match("/[\W_]/", $password)) {
         return "password must contain at least one special character";
     }
     return true;
@@ -50,7 +50,7 @@ function validate_post_content($content) {
 
 // Sanitization functions
 function sanitize_input($input) {
-    return htmlspecialchars(trim($input));
+    return strip_tags(trim($input));
 }
 
 function sanitize_post_content($content) {

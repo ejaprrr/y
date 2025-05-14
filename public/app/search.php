@@ -1,5 +1,7 @@
 <?php
-
+ini_set("display_errors", 1);
+ini_set("display_startup_errors", 1);
+error_reporting(E_ALL);
 require_once "../../src/functions/connection.php";
 require_once "../../src/functions/auth.php";
 require_once "../../src/functions/helpers.php";
@@ -23,45 +25,45 @@ if (!check_login()) {
 set_csrf_token();
 
 // get user information
-$user = get_user($conn, $_SESSION['user_id']);
+$user = get_user($conn, $_SESSION["user_id"]);
 
 // get users that current user follows (for the dropdown)
-$followed_users = get_followed_users($conn, $user['id']);
+$followed_users = get_followed_users($conn, $user["id"]);
 
 // initialize variables
 $search_results = [];
-$error = '';
-$message = '';
+$error = "";
+$message = "";
 $total_results = 0;
 
 // default search values
 $default_values = [
-    'keyword' => '',
-    'exclude_keyword' => '',
-    'case_sensitive' => false,
-    'whole_word' => false,
-    'from_date' => '',
-    'to_date' => '',
-    'sort_by' => 'recent',
-    'limit' => 25,
-    'followed_users' => []
+    "keyword" => "",
+    "exclude_keyword" => "",
+    "case_sensitive" => false,
+    "whole_word" => false,
+    "from_date" => "",
+    "to_date" => "",
+    "sort_by" => "recent",
+    "limit" => 25,
+    "followed_users" => []
 ];
 
 // handle search
-if ($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET['keyword'])) {
+if ($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["keyword"])) {
     // quick search from right sidebar
-    $keyword = sanitize_input($_GET['keyword']);
+    $keyword = sanitize_input($_GET["keyword"]);
     if (!empty($keyword)) {
         $search_results = perform_search($conn, [
-            'keyword' => $keyword,
-            'sort_by' => 'recent',
-            'limit' => 25
-        ], $user['id']);
+            "keyword" => $keyword,
+            "sort_by" => "recent",
+            "limit" => 25
+        ], $user["id"]);
         $total_results = count($search_results);
     }
     
     // store the search term for form
-    $default_values['keyword'] = $keyword;
+    $default_values["keyword"] = $keyword;
 }
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -72,23 +74,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } else {
         // get search parameters
         $search_params = [
-            'keyword' => sanitize_input($_POST['keyword'] ?? ''),
-            'exclude_keyword' => sanitize_input($_POST['exclude_keyword'] ?? ''),
-            'case_sensitive' => isset($_POST['case_sensitive']),
-            'whole_word' => isset($_POST['whole_word']),
-            'from_date' => sanitize_input($_POST['from_date'] ?? ''),
-            'to_date' => sanitize_input($_POST['to_date'] ?? ''),
-            'sort_by' => sanitize_input($_POST['sort_by'] ?? 'recent'),
-            'limit' => intval($_POST['limit'] ?? 25),
-            'followed_users' => isset($_POST['followed_users']) ? $_POST['followed_users'] : []
+            "keyword" => sanitize_input($_POST["keyword"] ?? ""),
+            "exclude_keyword" => sanitize_input($_POST["exclude_keyword"] ?? ""),
+            "case_sensitive" => isset($_POST["case_sensitive"]),
+            "whole_word" => isset($_POST["whole_word"]),
+            "from_date" => sanitize_input($_POST["from_date"] ?? ""),
+            "to_date" => sanitize_input($_POST["to_date"] ?? ""),
+            "sort_by" => sanitize_input($_POST["sort_by"] ?? "recent"),
+            "limit" => intval($_POST["limit"] ?? 25),
+            "followed_users" => isset($_POST["followed_users"]) ? $_POST["followed_users"] : []
         ];
         
         // store the form values for repopulation
         $default_values = $search_params;
         
         // perform search if keyword provided
-        if (!empty($search_params['keyword']) || !empty($search_params['followed_users'])) {
-            $search_results = perform_search($conn, $search_params, $user['id']);
+        if (!empty($search_params["keyword"]) || !empty($search_params["followed_users"])) {
+            $search_results = perform_search($conn, $search_params, $user["id"]);
             $total_results = count($search_results);
         } else {
             $error = "please enter at least keyword or select users";
@@ -112,7 +114,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <?php render_left_sidebar($user); ?>
 
     <div class="main-content">
-        <?php render_page_header('search', 'find posts and users', '', []); ?>
+        <?php render_page_header("search", "find posts and users", $_GET["origin"] ?? "feed.php", []); ?>
         
         <!-- search form -->
         <div class="m-3 p-3 card rounded-3">
@@ -122,7 +124,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <div class="col-6">
                         <label for="keyword" class="fw-bold">keyword</label>
                         <input type="text" class="form-control rounded-3" id="keyword" name="keyword" 
-                                value="<?= htmlspecialchars($default_values['keyword']) ?>" 
+                                value="<?= htmlspecialchars($default_values["keyword"]) ?>" 
                                 placeholder="start typing..." required>
                         <div class="form-text">search for text, usernames, hashtags...</div>
                     </div>
@@ -131,9 +133,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <div class="col-6">
                         <label for="exclude_keyword" class="fw-bold">excluding keyword</label>
                         <input type="text" class="form-control rounded-3" id="exclude_keyword" name="exclude_keyword" 
-                                value="<?= htmlspecialchars($default_values['exclude_keyword']) ?>"
+                                value="<?= htmlspecialchars($default_values["exclude_keyword"]) ?>"
                                 placeholder="start typing...">
-                        <div class="form-text">results won't contain this keyword</div>
+                        <div class="form-text">results won"t contain this keyword</div>
                     </div>
                     
                     <!-- keyword options -->
@@ -141,14 +143,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         <div class="fw-bold mb-2">keyword options</div>
                         <div class="form-check mb-2">
                             <input class="form-check-input" type="checkbox" id="case_sensitive" name="case_sensitive" 
-                                    <?= $default_values['case_sensitive'] ? 'checked' : '' ?>>
+                                    <?= $default_values["case_sensitive"] ? "checked" : "" ?>>
                             <label for="case_sensitive">
                                 case sensitive
                             </label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="whole_word" name="whole_word"
-                                    <?= $default_values['whole_word'] ? 'checked' : '' ?>>
+                                    <?= $default_values["whole_word"] ? "checked" : "" ?>>
                             <label for="whole_word">
                                 match whole word only
                             </label>
@@ -166,7 +168,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                         <i class="bi bi-calendar3"></i>
                                     </span>
                                     <input type="date" class="form-control rounded-end-3" id="from_date" name="from_date"
-                                            value="<?= htmlspecialchars($default_values['from_date']) ?>">
+                                            value="<?= htmlspecialchars($default_values["from_date"]) ?>">
                                 </div>
                             </div>
                             <div class="w-100">
@@ -176,7 +178,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                         <i class="bi bi-calendar3"></i>
                                     </span>
                                     <input type="date" class="form-control rounded-end-3" id="to_date" name="to_date"
-                                            value="<?= htmlspecialchars($default_values['to_date']) ?>">
+                                            value="<?= htmlspecialchars($default_values["to_date"]) ?>">
                                 </div>
                             </div>
                         </div>
@@ -186,10 +188,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <div class="col-6">
                         <label for="sort_by" class="fw-bold">sort by</label>
                         <select class="form-control rounded-3" id="sort_by" name="sort_by">
-                            <option value="recent" <?= $default_values['sort_by'] === 'recent' ? 'selected' : '' ?>>
+                            <option value="recent" <?= $default_values["sort_by"] === "recent" ? "selected" : "" ?>>
                                 newest first
                             </option>
-                            <option value="popular" <?= $default_values['sort_by'] === 'popular' ? 'selected' : '' ?>>
+                            <option value="popular" <?= $default_values["sort_by"] === "popular" ? "selected" : "" ?>>
                                 most popular first
                             </option>
                         </select>
@@ -198,9 +200,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <div class="col-6">
                         <label for="limit" class="fw-bold">limit results</label>
                         <select class="form-control rounded-3" id="limit" name="limit">
-                            <option value="25" <?= $default_values['limit'] == 25 ? 'selected' : '' ?>>25 results</option>
-                            <option value="50" <?= $default_values['limit'] == 50 ? 'selected' : '' ?>>50 results</option>
-                            <option value="100" <?= $default_values['limit'] == 100 ? 'selected' : '' ?>>100 results</option>
+                            <option value="25" <?= $default_values["limit"] == 25 ? "selected" : "" ?>>25 results</option>
+                            <option value="50" <?= $default_values["limit"] == 50 ? "selected" : "" ?>>50 results</option>
+                            <option value="100" <?= $default_values["limit"] == 100 ? "selected" : "" ?>>100 results</option>
                         </select>
                     </div>
                     
@@ -210,23 +212,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         <select class="form-control rounded-3" id="followed_users" name="followed_users[]" multiple>
                             <?php if (!empty($followed_users)): ?>
                                 <?php foreach ($followed_users as $follow_user): ?>
-                                    <option value="<?= $follow_user['id'] ?>" 
-                                            <?= in_array($follow_user['id'], $default_values['followed_users']) ? 'selected' : '' ?>>
-                                        @<?= htmlspecialchars($follow_user['username']) ?> 
-                                        <?php if ($follow_user['display_name']): ?>
-                                            (<?= htmlspecialchars($follow_user['display_name']) ?>)
+                                    <option value="<?= $follow_user["id"] ?>" 
+                                            <?= in_array($follow_user["id"], $default_values["followed_users"]) ? "selected" : "" ?>>
+                                        @<?= htmlspecialchars($follow_user["username"]) ?> 
+                                        <?php if ($follow_user["display_name"]): ?>
+                                            (<?= htmlspecialchars($follow_user["display_name"]) ?>)
                                         <?php endif; ?>
                                     </option>
                                 <?php endforeach; ?>
                             <?php else: ?>
-                                <option disabled>you're not following anyone yet</option>
+                                <option disabled>you"re not following anyone yet</option>
                             <?php endif; ?>
                         </select>
                         <div class="form-text">hold ctrl/cmd to select multiple users</div>
                     </div>
                     
                     <!-- CSRF token -->
-                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION["csrf_token"]) ?>">
                     
                     <!-- submit button -->
                     <div class="col-12 mt-4">
@@ -252,15 +254,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 </div>
                 
                 <div class="posts">
-                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION["csrf_token"]) ?>">
                     <?php foreach ($search_results as $post): ?>
                         <?php render_post($post, $conn); ?> 
                     <?php endforeach; ?>
                 </div>
-            <?php elseif ($_SERVER["REQUEST_METHOD"] === "POST" || isset($_GET['keyword'])): ?>
-                <?php render_empty_state('search', 'no results found', 'try different search terms or filters'); ?>
+            <?php elseif ($_SERVER["REQUEST_METHOD"] === "POST" || isset($_GET["keyword"])): ?>
+                <?php render_empty_state("search", "no results found", "try different search terms or filters"); ?>
             <?php else: ?>
-                <?php render_empty_state('search', 'start searching', 'use the form above to find posts'); ?>
+                <?php render_empty_state("search", "start searching", "use the form above to find posts"); ?>
             <?php endif; ?>
         </div>
     </div>
@@ -271,5 +273,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 <!-- include interaction.js for like functionality -->
 <script src="../assets/js/interaction.js"></script>
+<script src="../assets/js/pages/search.js"></script>
 
 <?php render_footer(); ?>

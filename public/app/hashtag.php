@@ -23,23 +23,23 @@ if (!check_login()) {
 set_csrf_token();
 
 // Get user information
-$user = get_user($conn, $_SESSION['user_id']);
+$user = get_user($conn, $_SESSION["user_id"]);
 
 // Get hashtag from URL
-$tag = isset($_GET['tag']) ? sanitize_input($_GET['tag']) : '';
+$tag = isset($_GET["tag"]) ? sanitize_input($_GET["tag"]) : "";
 
 if (empty($tag)) {
     redirect("feed.php");
 }
 
-// Determine active tab (default to 'latest')
-$active_tab = isset($_GET['tab']) ? sanitize_input($_GET['tab']) : 'latest';
+// Determine active tab (default to "latest")
+$active_tab = isset($_GET["tab"]) ? sanitize_input($_GET["tab"]) : "latest";
 
 // Fetch posts based on the active tab
-if ($active_tab === 'most_liked') {
-    $posts = get_posts_by_hashtag_sorted($conn, $tag, 'like_count');
+if ($active_tab === "most_liked") {
+    $posts = get_posts_by_hashtag_sorted($conn, $tag, "like_count");
 } else {
-    $posts = get_posts_by_hashtag_sorted($conn, $tag, 'created_at');
+    $posts = get_posts_by_hashtag_sorted($conn, $tag, "created_at");
 }
 
 $post_count = get_hashtag_post_count($conn, $tag);
@@ -56,6 +56,9 @@ $post_count = get_hashtag_post_count($conn, $tag);
 <link rel="stylesheet" href="../assets/css/components/page-header.css">
 
 <div class="d-flex">
+    <!-- CSRF token -->
+    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION["csrf_token"]) ?>">
+                    
     <?php render_left_sidebar($user); ?>
 
     <div class="main-content">
@@ -63,22 +66,22 @@ $post_count = get_hashtag_post_count($conn, $tag);
             // Define tabs
             $hashtag_tabs = [
                 [
-                    'label' => 'latest',
-                    'url' => '?tag=' . htmlspecialchars($tag) . '&tab=latest',
-                    'active' => $active_tab === 'latest'
+                    "label" => "latest",
+                    "url" => "?tag=" . htmlspecialchars($tag) . "&tab=latest",
+                    "active" => $active_tab === "latest"
                 ],
                 [
-                    'label' => 'popular',
-                    'url' => '?tag=' . htmlspecialchars($tag) . '&tab=most_liked',
-                    'active' => $active_tab === 'most_liked'
+                    "label" => "popular",
+                    "url" => "?tag=" . htmlspecialchars($tag) . "&tab=most_liked",
+                    "active" => $active_tab === "most_liked"
                 ]
             ];
 
             // Render page header with tabs
             render_page_header(
-                '#' . htmlspecialchars($tag),
-                number_format($post_count) . ' posts',
-                'feed.php',
+                "#" . htmlspecialchars($tag),
+                number_format($post_count) . " posts",
+                $_GET["origin"] ?? "feed.php",
                 $hashtag_tabs
             );
         ?>
@@ -92,9 +95,9 @@ $post_count = get_hashtag_post_count($conn, $tag);
             <?php else: ?>
                 <?php 
                     render_empty_state(
-                        'hash',
-                        'no posts with #' . htmlspecialchars($tag) . ' yet',
-                        'be the first to use this hashtag!'
+                        "hash",
+                        "no posts with #" . htmlspecialchars($tag) . " yet",
+                        "be the first to use this hashtag!"
                     );
                 ?>
             <?php endif; ?>

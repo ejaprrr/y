@@ -19,7 +19,7 @@ function add_post($conn, $username, $content) {
     $user_result = $user_stmt->get_result();
     
     if ($user_row = $user_result->fetch_assoc()) {
-        $user_id = $user_row['id'];
+        $user_id = $user_row["id"];
         
         // Now insert the post with user_id
         $stmt = $conn->prepare("INSERT INTO posts (user_id, content) VALUES (?, ?)");

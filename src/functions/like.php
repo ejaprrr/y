@@ -38,6 +38,6 @@ function get_like_count($conn, $post_id) {
     $stmt->execute();
     $result = $stmt->get_result()->fetch_assoc();
     $stmt->close();
-    return (int)($result['count'] ?? 0);
+    return (int)($result["count"] ?? 0);
 }
 ?>

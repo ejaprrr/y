@@ -3,7 +3,7 @@
 // Extract hashtags from content
 function extract_hashtags($content) {
     $hashtags = [];
-    preg_match_all('/#(\w+)/', $content, $matches);
+    preg_match_all("/#(\w+)/", $content, $matches);
     if (!empty($matches[1])) {
         $hashtags = array_filter(array_unique($matches[1]), function($hashtag) {
             return strlen($hashtag) <= 24; // Limit hashtags to 24 characters
@@ -30,7 +30,7 @@ function save_hashtags($conn, $post_id, $content) {
 
 // Get trending hashtags
 function get_trending_hashtags($conn, $limit = 3) {
-    $past_week = date('Y-m-d H:i:s', strtotime('-7 days'));
+    $past_week = date("Y-m-d H:i:s", strtotime("-7 days"));
     
     $sql = "SELECT hashtag, COUNT(*) as count 
             FROM hashtags 
@@ -54,10 +54,10 @@ function get_trending_hashtags($conn, $limit = 3) {
 }
 
 // Get posts by hashtag with sorting
-function get_posts_by_hashtag_sorted($conn, $hashtag, $sort_by = 'created_at') {
-    $valid_sort_columns = ['created_at', 'like_count'];
+function get_posts_by_hashtag_sorted($conn, $hashtag, $sort_by = "created_at") {
+    $valid_sort_columns = ["created_at", "like_count"];
     if (!in_array($sort_by, $valid_sort_columns)) {
-        $sort_by = 'created_at';
+        $sort_by = "created_at";
     }
 
     $sql = "SELECT posts.*, users.username, users.display_name, users.profile_picture,
@@ -70,7 +70,7 @@ function get_posts_by_hashtag_sorted($conn, $hashtag, $sort_by = 'created_at') {
             ORDER BY $sort_by DESC";
             
     $stmt = $conn->prepare($sql);
-    $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0;
+    $user_id = isset($_SESSION["user_id"]) ? $_SESSION["user_id"] : 0;
     $stmt->bind_param("is", $user_id, $hashtag);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -92,16 +92,16 @@ function get_hashtag_post_count($conn, $hashtag) {
     $result = $stmt->get_result()->fetch_assoc();
     $stmt->close();
     
-    return $result['count'] ?? 0;
+    return $result["count"] ?? 0;
 }
 
 // Format post content to highlight hashtags
 function format_content_with_hashtags($content) {
-    return preg_replace_callback('/#(\w+)/', function ($matches) {
+    return preg_replace_callback("/#(\w+)/", function ($matches) {
         if (strlen($matches[1]) <= 24) { // Only highlight hashtags <= 24 chars
-            return '<a href="../app/hashtag.php?tag=' . htmlspecialchars($matches[1]) . '" class="hashtag">#' . htmlspecialchars($matches[1]) . '</a>';
+            return "<a href=\"../app/hashtag.php?tag=" . urlencode($matches[1]) . "&origin=" . get_clean_url() . "\" class=\"hashtag\">#" . htmlspecialchars($matches[1]) . "</a>";
         }
-        return '#' . htmlspecialchars($matches[1]); // Leave longer hashtags as plain text
+        return "#" . htmlspecialchars($matches[1]); // Leave longer hashtags as plain text
     }, $content);
 }
 ?>

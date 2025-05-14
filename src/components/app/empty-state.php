@@ -1,6 +1,6 @@
 <?php
 
-function render_empty_state($icon, $message, $description = '') {
+function render_empty_state($icon, $message, $description = "") {
 ?>
 <div class="text-center my-5 py-5 empty-state">
     <i class="bi bi-<?= htmlspecialchars($icon) ?> fs-1"></i>

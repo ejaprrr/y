@@ -109,7 +109,7 @@ function get_follower_count($conn, $user_id) {
     $stmt->execute();
     $result = $stmt->get_result()->fetch_assoc();
     $stmt->close();
-    return (int)($result['count'] ?? 0);
+    return (int)($result["count"] ?? 0);
 }
 
 function get_following_count($conn, $user_id) {
@@ -118,7 +118,7 @@ function get_following_count($conn, $user_id) {
     $stmt->execute();
     $result = $stmt->get_result()->fetch_assoc();
     $stmt->close();
-    return (int)($result['count'] ?? 0);
+    return (int)($result["count"] ?? 0);
 }
 
 function is_following($conn, $follower_id, $followed_id) {
@@ -140,7 +140,7 @@ function get_total_likes_received($conn, $user_id) {
     $stmt->execute();
     $result = $stmt->get_result()->fetch_assoc();
     $stmt->close();
-    return (int)($result['count'] ?? 0);
+    return (int)($result["count"] ?? 0);
 }
 
 function perform_search($conn, $params, $user_id) {
@@ -163,15 +163,15 @@ function perform_search($conn, $params, $user_id) {
     $where_conditions = [];
     
     // keyword search (in post content, username, display name, or hashtags)
-    if (!empty($params['keyword'])) {
-        $keyword_search = $params['keyword'];
+    if (!empty($params["keyword"])) {
+        $keyword_search = $params["keyword"];
         
         // Handle case sensitivity
-        $like_operator = isset($params['case_sensitive']) && $params['case_sensitive'] ? "LIKE BINARY" : "LIKE";
+        $like_operator = isset($params["case_sensitive"]) && $params["case_sensitive"] ? "LIKE BINARY" : "LIKE";
         
         // Handle whole word search
-        if (isset($params['whole_word']) && $params['whole_word']) {
-            // For whole word search, we'll split into words and search each one
+        if (isset($params["whole_word"]) && $params["whole_word"]) {
+            // For whole word search, we"ll split into words and search each one
             $keyword = explode(" ", $keyword_search);
             $keyword_conditions = [];
             
@@ -206,11 +206,11 @@ function perform_search($conn, $params, $user_id) {
     }
     
     // Exclude keyword
-    if (!empty($params['exclude_keyword'])) {
-        $exclude_search = $params['exclude_keyword'];
-        $like_operator = isset($params['case_sensitive']) && $params['case_sensitive'] ? "LIKE BINARY" : "LIKE";
+    if (!empty($params["exclude_keyword"])) {
+        $exclude_search = $params["exclude_keyword"];
+        $like_operator = isset($params["case_sensitive"]) && $params["case_sensitive"] ? "LIKE BINARY" : "LIKE";
         
-        // For exclude, we want posts that DON'T contain these terms
+        // For exclude, we want posts that don'T contain these terms
         $search_pattern = "%" . $exclude_search . "%";
         $where_conditions[] = "(posts.content NOT $like_operator ? AND users.username NOT $like_operator ? AND users.display_name NOT $like_operator ? AND
                              NOT EXISTS(SELECT 1 FROM hashtags WHERE hashtags.post_id = posts.id AND hashtags.hashtag $like_operator ?))";
@@ -222,24 +222,24 @@ function perform_search($conn, $params, $user_id) {
     }
     
     // Date range (from)
-    if (!empty($params['from_date'])) {
-        $where_conditions[] = "p.created_at >= ?";
-        $sql_params[] = $params['from_date'] . " 00:00:00";
+    if (!empty($params["from_date"])) {
+        $where_conditions[] = "posts.created_at >= ?";
+        $sql_params[] = $params["from_date"] . " 00:00:00";
         $sql_types .= "s";
     }
     
     // Date range (to)
-    if (!empty($params['to_date'])) {
-        $where_conditions[] = "p.created_at <= ?";
-        $sql_params[] = $params['to_date'] . " 23:59:59";
+    if (!empty($params["to_date"])) {
+        $where_conditions[] = "posts.created_at <= ?";
+        $sql_params[] = $params["to_date"] . " 23:59:59";
         $sql_types .= "s";
     }
     
     // Filter by followed users
-    if (!empty($params['followed_users'])) {
-        $placeholders = implode(',', array_fill(0, count($params['followed_users']), '?'));
-        $where_conditions[] = "u.id IN ($placeholders)";
-        foreach ($params['followed_users'] as $followed_id) {
+    if (!empty($params["followed_users"])) {
+        $placeholders = implode(",", array_fill(0, count($params["followed_users"]), "?"));
+        $where_conditions[] = "users.id IN ($placeholders)";
+        foreach ($params["followed_users"] as $followed_id) {
             $sql_params[] = $followed_id;
             $sql_types .= "i";
         }
@@ -252,11 +252,11 @@ function perform_search($conn, $params, $user_id) {
     }
     
     // Sorting
-    switch ($params['sort_by']) {
-        case 'popular':
+    switch ($params["sort_by"]) {
+        case "popular":
             $sql .= " ORDER BY like_count DESC, posts.created_at DESC";
             break;
-        case 'recent':
+        case "recent":
         default:
             $sql .= " ORDER BY posts.created_at DESC";
             break;
@@ -264,7 +264,7 @@ function perform_search($conn, $params, $user_id) {
     
     // Limit
     $sql .= " LIMIT ?";
-    $sql_params[] = $params['limit'];
+    $sql_params[] = $params["limit"];
     $sql_types .= "i";
     
     // Execute query
@@ -306,6 +306,61 @@ function get_followed_users($conn, $user_id) {
     
     $stmt->close();
     return $users;
+}
+
+function get_suggested_users($conn, $user_id, $limit = 3) {
+    // Get users the current user is already following
+    $sql = "SELECT followed_id FROM follows WHERE follower_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    $followed_ids = [];
+    $followed_ids[] = $user_id; // Include current user in exclusion list
+    
+    while ($row = $result->fetch_assoc()) {
+        $followed_ids[] = $row["followed_id"];
+    }
+    $stmt->close();
+    
+    // Handle case where user follows no one yet
+    if (count($followed_ids) === 1) {
+        // Just exclude the current user
+        $exclude_sql = "WHERE users.id != ?";
+        $params = [$user_id];
+        $types = "i";
+    } else {
+        // Exclude all followed users
+        $placeholders = implode(",", array_fill(0, count($followed_ids), "?"));
+        $exclude_sql = "WHERE users.id NOT IN ($placeholders)";
+        $params = $followed_ids;
+        $types = str_repeat("i", count($followed_ids));
+    }
+    
+    // Find popular users not followed by current user
+    $sql = "SELECT users.id, users.username, users.display_name, users.profile_picture,
+            (SELECT COUNT(*) FROM follows WHERE followed_id = users.id) as follower_count
+            FROM users
+            $exclude_sql
+            ORDER BY follower_count DESC
+            LIMIT ?";
+    
+    $stmt = $conn->prepare($sql);
+    $params[] = $limit;
+    $types .= "i";
+    
+    $stmt->bind_param($types, ...$params);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    $suggested_users = [];
+    while ($row = $result->fetch_assoc()) {
+        $suggested_users[] = $row;
+    }
+    
+    $stmt->close();
+    return $suggested_users;
 }
 
 ?>

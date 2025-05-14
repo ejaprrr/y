@@ -14,10 +14,12 @@
 
 .search-form select[multiple] {
   background-color: var(--gray-800);
-  border: 1px solid var(--gray-600);
-  color: var(--gray-100);
-  padding: 0.5rem;
-  height: 100px;
+  max-height: 150px;
+  overflow-y: auto !important; /* Only show scrollbar when needed */
+  overflow-x: hidden;
+  min-height: unset; /* Remove any forced min-height */
+  height: auto; /* Allow height to adjust to content */
+  max-height: 200px; /* Only apply max-height to enable scrolling when needed */
 }
 
 .search-form select[multiple] option {
@@ -36,20 +38,22 @@
   background-color: var(--gray-700);
 }
 
+/* Remove any custom scrollbar styling that might be causing issues */
+select[multiple]::-webkit-scrollbar {
+  width: 6px;
+  background: transparent;
+  display: none;
+}
+
+/* Only display scrollbar when it's actually needed */
+select[multiple].has-overflow::-webkit-scrollbar {
+  display: block;
+}
+
 /* Date input styling */
-.search-form input[type="date"] {
+.input[type="date"] {
   background-color: var(--gray-800);
   border: 1px solid var(--gray-600);
   color: var(--gray-100);
   padding: 0.5rem 0.75rem;
-}
-
-.search-form input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(0.8);
-  opacity: 0.7;
-  cursor: pointer;
-}
-
-.search-form input[type="date"]::-webkit-calendar-picker-indicator:hover {
-  opacity: 1;
 }
