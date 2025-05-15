@@ -56,6 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $success = add_post($conn, $user["username"], $content);
             if ($success) {
                 $message = "post created successfully";
+                regenerate_csrf_token(false);
             } else {
                 $error = "failed to create post";
             }
@@ -85,8 +86,6 @@ if ($active_tab === "following") {
 <link rel="stylesheet" href="../assets/css/components/page-header.css">
 
 <div class="d-flex">
-    <input type="hidden" name="csrf_token" value="<?php
- echo $_SESSION['csrf_token']; ?>">
 
     <?php
  render_left_sidebar($user); ?>
