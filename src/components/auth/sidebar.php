@@ -9,6 +9,7 @@ function render_sidebar() {
     <div class="links-wrapper d-flex w-100 mt-auto gap-3 justify-content-center">
         <a href="../landing/home.php" class="d-block mb-3 text-lowercase">home</a>
         <a href="../landing/about-us.php" class="d-block mb-3 text-lowercase">about us</a>
+        <a href="../assets/downloads/y-project-info.zip" download class="d-block mb-3">download project info</a>
         <span class="mb-3 text-lowercase">&copy; y, 2025</span>
     </div>
 </div>

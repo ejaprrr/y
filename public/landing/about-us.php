@@ -67,6 +67,7 @@ render_header("about us");
     <div class="links-wrapper d-flex mt-4 gap-3 justify-content-center">
         <a href="home.php" class="d-block mb-3">home</a>
         <a href="#" class="d-block mb-3">about us</a>
+        <a href="../assets/downloads/y-project-info.zip" download class="d-block mb-3">download project info</a>
         <span class="mb-3">&copy; Y, 2025</span>
     </div>
 </div>
