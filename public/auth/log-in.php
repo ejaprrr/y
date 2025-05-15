@@ -74,6 +74,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <?php render_form_container_end(); ?>
 </div>
 
-<script src="../assets/js/log-in.js"></script>
+<script src="../assets/js/pages/log-in.js"></script>
 
 <?php render_footer(); ?>

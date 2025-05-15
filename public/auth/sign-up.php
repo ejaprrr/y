@@ -102,7 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <?php render_form_container_end(); ?>
 </div>
 
-<script src="../assets/js/sign-up.js"></script>
+<script src="../assets/js/pages/sign-up.js"></script>
 
 <?php render_footer(); ?>
 
