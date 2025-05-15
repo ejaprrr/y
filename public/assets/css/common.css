@@ -218,3 +218,33 @@ textarea {
   color: var(--gray-300);
   border-color: var(--gray-600);
 }
+
+.form-text {
+  color: var(--gray-400);
+  font-size: 0.8rem;
+}
+
+/* Unified counter styling for both post and bio counters */
+.post-counter-wrapper,
+#post-counter,
+#bio-counter {
+  color: var(--gray-300);
+  font-size: 0.85rem;
+  transition: color 0.2s ease;
+}
+
+/* Bootstrap integration for warning state */
+.text-warning {
+  color: var(--bs-warning) !important;
+}
+
+/* Bootstrap integration for danger state */
+.text-danger {
+  color: var(--bs-danger) !important;
+}
+
+/* Make sure counter font-sizes are consistent */
+.form-text #post-counter,
+.form-text #bio-counter {
+  font-size: 0.85rem !important;
+}

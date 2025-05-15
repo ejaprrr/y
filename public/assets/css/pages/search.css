@@ -3,11 +3,6 @@
   border-color: var(--gray-500);
 }
 
-.search-form .form-text {
-  color: var(--gray-400);
-  font-size: 0.8rem;
-}
-
 .date-icon {
   background-color: var(--gray-700);
 }

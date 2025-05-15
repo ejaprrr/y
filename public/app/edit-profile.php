@@ -42,65 +42,69 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         // basic validation
         if (strlen($display_name) > 48) {
             $error = "display name is too long (maximum 48 characters)";
-        } elseif (strlen($bio) > 128) {
-            $error = "bio is too long (maximum 128 characters)";
         } else {
-            // update profile info
-            $success = update_user_profile($conn, $_SESSION["user_id"], $display_name, $bio);
-            
-            // handle profile picture upload
-            if (!empty($_FILES["profile_picture"]["name"])) {
-                // validate the image
-                $valid = validate_image($_FILES["profile_picture"]);
-                if ($valid) {
-                    // create simpler file names
-                    $filename = "profile_" . $_SESSION["user_id"] . "_" . time() . "." . 
-                                pathinfo($_FILES["profile_picture"]["name"], PATHINFO_EXTENSION);
-                    
-                    // create target path
-                    $target_path = $upload_base . "/profile/" . $filename;
-                    
-                    // move the uploaded file
-                    if (move_uploaded_file($_FILES["profile_picture"]["tmp_name"], $target_path)) {
-                        $profile_path = "/y/public/uploads/profile/" . $filename;
-                        update_profile_picture($conn, $_SESSION["user_id"], $profile_path);
-                    } else {
-                        $error = "failed to upload profile picture";
-                    }
-                } else {
-                    $error = $valid;
-                }
-            }
-            
-            // handle cover image upload
-            if (!empty($_FILES["cover_image"]["name"])) {
-                $valid = validate_image($_FILES["cover_image"]);
+            // Validate bio
+            $bio_validation = validate_bio($bio);
+            if ($bio_validation !== true) {
+                $error = $bio_validation;
+            } else {
+                // update profile info
+                $success = update_user_profile($conn, $_SESSION["user_id"], $display_name, $bio);
                 
-                if ($valid) {
-                    // create simpler filenames
-                    $filename = "cover_" . $_SESSION["user_id"] . "_" . time() . "." . 
-                               pathinfo($_FILES["cover_image"]["name"], PATHINFO_EXTENSION);
-                    
-                    // create target path
-                    $target_path = $upload_base . "/cover/" . $filename;
-                    
-                    // move the uploaded file
-                    if (move_uploaded_file($_FILES["cover_image"]["tmp_name"], $target_path)) {
-                        $cover_path = "/y/public/uploads/cover/" . $filename;
-                        update_cover_image($conn, $_SESSION["user_id"], $cover_path);
+                // handle profile picture upload
+                if (!empty($_FILES["profile_picture"]["name"])) {
+                    // validate the image
+                    $valid = validate_image($_FILES["profile_picture"]);
+                    if ($valid) {
+                        // create simpler file names
+                        $filename = "profile_" . $_SESSION["user_id"] . "_" . time() . "." . 
+                                    pathinfo($_FILES["profile_picture"]["name"], PATHINFO_EXTENSION);
+                        
+                        // create target path
+                        $target_path = $upload_base . "/profile/" . $filename;
+                        
+                        // move the uploaded file
+                        if (move_uploaded_file($_FILES["profile_picture"]["tmp_name"], $target_path)) {
+                            $profile_path = "/y/public/uploads/profile/" . $filename;
+                            update_profile_picture($conn, $_SESSION["user_id"], $profile_path);
+                        } else {
+                            $error = "failed to upload profile picture";
+                        }
                     } else {
-                        $error = "failed to upload cover image";
+                        $error = $valid;
                     }
-                } else {
-                    $error = $valid;
                 }
-            }
-            
-            if (empty($error)) {
-                $message = "profile updated successfully";
                 
-                // refresh user data
-                $user = get_user($conn, $_SESSION["user_id"]);
+                // handle cover image upload
+                if (!empty($_FILES["cover_image"]["name"])) {
+                    $valid = validate_image($_FILES["cover_image"]);
+                    
+                    if ($valid) {
+                        // create simpler filenames
+                        $filename = "cover_" . $_SESSION["user_id"] . "_" . time() . "." . 
+                                   pathinfo($_FILES["cover_image"]["name"], PATHINFO_EXTENSION);
+                        
+                        // create target path
+                        $target_path = $upload_base . "/cover/" . $filename;
+                        
+                        // move the uploaded file
+                        if (move_uploaded_file($_FILES["cover_image"]["tmp_name"], $target_path)) {
+                            $cover_path = "/y/public/uploads/cover/" . $filename;
+                            update_cover_image($conn, $_SESSION["user_id"], $cover_path);
+                        } else {
+                            $error = "failed to upload cover image";
+                        }
+                    } else {
+                        $error = $valid;
+                    }
+                }
+                
+                if (empty($error)) {
+                    $message = "profile updated successfully";
+                    
+                    // refresh user data
+                    $user = get_user($conn, $_SESSION["user_id"]);
+                }
             }
         }
     }
@@ -146,14 +150,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <div class="profile-header-preview">
                     <!-- cover image -->
                     <div class="cover-container position-relative">
-                        <div class="cover-image-preview" id="cover-preview" 
+                        <div class="cover-image-preview" id="cover-preview">
                             <?php if ($user["cover_image"]): ?>
-                                style="background-image: url("<?= htmlspecialchars($user["cover_image"]) ?>")"
-                            <?php endif; ?>>
+                                <img src="<?= htmlspecialchars($user["cover_image"]) ?>" alt="Cover" class="cover-img">
+                            <?php else: ?>
+                                <div class="cover-placeholder"></div>
+                            <?php endif; ?>
                         </div>
                         <div class="cover-overlay d-flex align-items-center justify-content-center">
                             <label for="cover_image" class="btn btn-dark rounded-pill px-3">
-                                <i class="bi bi-camera-fill me-2"></i>Change cover
+                                <i class="bi bi-camera-fill me-2"></i>change cover
                             </label>
                         </div>
                     </div>
@@ -188,14 +194,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         <input type="text" class="form-control rounded-3" id="display_name" name="display_name" 
                                value="<?= htmlspecialchars($user["display_name"] ?? $user["username"]) ?>" 
                                maxlength="48" required>
-                        <div>your name as displayed on your profile (48 characters max)</div>
+                        <div class="form-text">your name as displayed on your profile (48 characters max)</div>
                     </div>
                     
                     <div class="mb-3">
                         <label for="bio" class="form-label fw-bold">bio</label>
-                        <textarea class="form-control rounded-3" id="bio" name="bio" rows="3" maxlength="128"><?= htmlspecialchars($user["bio"] ?? "") ?></textarea>
+                        <textarea class="form-control rounded-3" id="bio" name="bio" rows="3"><?= htmlspecialchars($user["bio"] ?? "") ?></textarea>
                         <div class="d-flex justify-content-between align-items-center mt-1">
-                            <span>tell the world about usourself</span>
+                            <span class="form-text">tell the world about usourself</span>
                             <span id="bio-counter"><?= strlen($user["bio"] ?? "") ?>/128</span>
                         </div>
                     </div>
@@ -279,16 +285,37 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
     
-    // Cover Image Preview (existing code)
+    // Cover Image Preview
     const coverImageInput = document.getElementById("cover_image");
     const coverPreview = document.getElementById("cover-preview");
-    
+
     coverImageInput.addEventListener("change", function() {
         if (this.files && this.files[0]) {
             const reader = new FileReader();
             
             reader.onload = function(e) {
-                coverPreview.style.backgroundImage = `url(${e.target.result})`;
+                // Check if there's already an img element
+                let coverImg = coverPreview.querySelector("img");
+                
+                if (coverImg) {
+                    // Update existing image
+                    coverImg.src = e.target.result;
+                } else {
+                    // Remove placeholder if it exists
+                    const placeholder = coverPreview.querySelector(".cover-placeholder");
+                    if (placeholder) {
+                        placeholder.remove();
+                    }
+                    
+                    // Create new image
+                    coverImg = document.createElement("img");
+                    coverImg.src = e.target.result;
+                    coverImg.alt = "Cover";
+                    coverImg.className = "cover-img";
+                    
+                    // Add the new image to the preview
+                    coverPreview.appendChild(coverImg);
+                }
             };
             
             reader.readAsDataURL(this.files[0]);
@@ -299,6 +326,11 @@ document.addEventListener("DOMContentLoaded", function() {
     bioTextarea.addEventListener("input", function() {
         const count = this.value.length;
         bioCounter.textContent = `${count}/128`;
+        
+        // Remove empty newlines from bio
+        if (this.value.includes("\n\n")) {
+            this.value = this.value.replace(/\n\n+/g, "\n");
+        }
         
         // Color coding based on character count
         if (count > 128-15) {
@@ -317,6 +349,24 @@ document.addEventListener("DOMContentLoaded", function() {
         validateForm();
     });
     
+    // Make the entire cover image area clickable
+    const coverContainer = document.querySelector('.cover-container');
+    coverContainer.addEventListener('click', function(e) {
+        // Don't trigger if clicking on the label itself
+        if (!e.target.closest('label')) {
+            document.getElementById('cover_image').click();
+        }
+    });
+    
+    // Make the entire profile picture area clickable
+    const profilePicContainer = document.querySelector('.profile-picture-container-edit');
+    profilePicContainer.addEventListener('click', function(e) {
+        // Don't trigger if clicking on the label itself
+        if (!e.target.closest('label')) {
+            document.getElementById('profile_picture').click();
+        }
+    });
+
     // Display name validation
     displayNameInput.addEventListener("input", validateForm);
     

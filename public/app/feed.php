@@ -151,5 +151,6 @@ if ($active_tab === "following") {
 
 <!-- ajax -->
 <script src="../assets/js/interaction.js"></script>
+<script src="../assets/js/post-composer.js"></script>
 
 <?php render_footer(); ?>

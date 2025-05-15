@@ -12,6 +12,11 @@ require_once "../../src/components/auth/form-container.php";
 start_session();
 set_csrf_token();
 
+// check if user is logged in
+if (check_login()) {
+    redirect("../app/feed.php");
+}
+
 $error = "";
 $error_field = "";
 

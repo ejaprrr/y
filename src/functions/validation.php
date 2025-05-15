@@ -45,6 +45,25 @@ function validate_post_content($content) {
     if (strlen($content) > 256) {
         return "post content cannot exceed 256 characters";
     }
+    
+    // Check for more than one consecutive empty newline
+    if (preg_match('/\n{3,}/', $content)) {
+        return "post content cannot contain more than one consecutive empty line";
+    }
+    
+    return true;
+}
+
+function validate_bio($bio) {
+    if (strlen($bio) > 128) {
+        return "bio cannot exceed 128 characters";
+    }
+    
+    // Check for any empty newlines
+    if (preg_match('/\n{2,}/', $bio)) {
+        return "bio cannot contain empty lines";
+    }
+    
     return true;
 }
 

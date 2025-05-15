@@ -6,14 +6,27 @@
   width: 100%;
   height: 200px;
   overflow: hidden;
+  cursor: pointer; /* Add pointer cursor */
 }
 
 .cover-image-preview {
   width: 100%;
   height: 100%;
   background-color: var(--gray-700);
-  background-size: cover;
-  background-position: center;
+  overflow: hidden;
+}
+
+.cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.cover-placeholder {
+  width: 100%;
+  height: 100%;
+  background-color: var(--gray-700);
 }
 
 .cover-overlay {
@@ -46,6 +59,7 @@
   overflow: hidden;
   border: 4px solid var(--gray-900);
   background-color: var(--gray-700);
+  cursor: pointer; /* Add pointer cursor */
 }
 
 .profile-picture-edit-img {
@@ -90,36 +104,6 @@
 
 .profile-picture-container-edit:hover .profile-picture-overlay {
   opacity: 1;
-}
-
-/* Form fields styling */
-.profile-form-fields {
-  padding-top: 2rem;
-}
-
-.profile-form-fields .form-control {
-  background-color: var(--gray-800);
-  border: 1px solid var(--gray-600);
-  color: var(--gray-100);
-  padding: 0.75rem 1rem;
-}
-
-.profile-form-fields > .form-control {
-  background-color: var(--gray-800);
-  border: 1px solid var(--gray-600);
-  color: var(--gray-100);
-  padding: 0.75rem 1rem;
-}
-
-.profile-form-fields .form-control:focus {
-  border-color: var(--blue);
-  box-shadow: 0 0 0 0.25rem rgba(72, 149, 239, 0.25);
-}
-
-.profile-form-fields .form-label {
-  color: var(--gray-200);
-  font-size: 1rem;
-  margin-bottom: 0.5rem;
 }
 
 /* Empty state styling */
