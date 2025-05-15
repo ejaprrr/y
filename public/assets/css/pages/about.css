@@ -1,8 +1,9 @@
 body {
   background: linear-gradient(0deg, var(--gray-900), var(--gray-800));
 }
+
 .splash-container {
-  height: 100vh;
+  padding: 2rem;
   display: flex;
   flex-direction: column;
   justify-content: center;

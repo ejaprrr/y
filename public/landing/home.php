@@ -46,6 +46,7 @@ require_once "../../src/components/layout.php";
     <div class="links-wrapper d-flex mt-4 gap-3 justify-content-center">
         <a href="#" class="d-block mb-3">home</a>
         <a href="about-us.php" class="d-block mb-3">about us</a>
+        <a href="../assets/downloads/y-project-info.zip" download class="d-block mb-3">download info</a>
         <span class="mb-3">&copy; Y, 2025</span>
     </div>
 </div>
