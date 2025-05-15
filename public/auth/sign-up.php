@@ -1,5 +1,4 @@
 <?php
-
 require_once "../../src/functions/connection.php";
 require_once "../../src/functions/auth.php";
 require_once "../../src/functions/validation.php";
@@ -10,12 +9,13 @@ require_once "../../src/components/auth/sidebar.php";
 require_once "../../src/components/auth/form-container.php";
 
 start_session();
-set_csrf_token();
 
 // check if user is logged in
 if (check_login()) {
     redirect("../app/feed.php");
 }
+
+regenerate_csrf_token();
 
 $error = "";
 $error_field = "";
@@ -61,19 +61,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 ?>
 
-<?php render_header("sign up"); ?>
+<?php
+ render_header("sign up"); ?>
 
 <link rel="stylesheet" href="../assets/css/pages/auth.css">
 <link rel="stylesheet" href="../assets/css/components/form-container.css">
 <link rel="stylesheet" href="../assets/css/components/sidebar.css">
 
 <div class="d-flex h-100">
-    <?php render_sidebar(); ?>
-    <?php render_form_container_start("hey there!", "start by creating an account."); ?>
+    <?php
+ render_sidebar(); ?>
+    <?php
+ render_form_container_start("hey there!", "start by creating an account."); ?>
 
-    <?php if (!empty($error)): ?>
+    <?php
+ if (!empty($error)): ?>
         <div class="alert alert-danger m-3"><?= $error ?></div>
-    <?php endif; ?>
+    <?php
+ endif; ?>
 
     <form method="POST">
         <div class="mb-4">
@@ -99,10 +104,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </form>
     <span class="mt-4 d-block w-100 text-center">already have an account? <a href="log-in.php">log in</a></span>
     
-    <?php render_form_container_end(); ?>
+    <?php
+ render_form_container_end(); ?>
 </div>
 
 <script src="../assets/js/pages/sign-up.js"></script>
 
-<?php render_footer(); ?>
+<?php
+ render_footer(); ?>
 

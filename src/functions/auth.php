@@ -1,20 +1,27 @@
 <?php
 require_once "connection.php";
 
-function set_csrf_token() {
-    if (empty($_SESSION["csrf_token"])) {
-        regenerate_csrf_token();
+function regenerate_csrf_token($check = true) {
+    if ($check && $_SERVER["REQUEST_METHOD"] === "POST") {
+        return;
     }
+
+    $csrf_token = bin2hex(random_bytes(32));
+    $_SESSION["csrf_token"] = $csrf_token;
 }
 
-function regenerate_csrf_token() {
-    $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
-}
-
-function check_csrf_token() {
+function check_csrf_token() {    
     if (empty($_SESSION["csrf_token"])) {
         return false;
     }
+    return hash_equals($_SESSION["csrf_token"], $_POST["csrf_token"] ?? "");
+}
+
+function check_ajax_csrf_token() {
+    if (empty($_POST["csrf_token"])) {
+        return false;
+    }
+
     return hash_equals($_SESSION["csrf_token"], $_POST["csrf_token"] ?? "");
 }
 

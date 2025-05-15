@@ -23,7 +23,7 @@ if (!check_login()) {
 }
 
 // set CSRF token
-set_csrf_token();
+regenerate_csrf_token();
 
 // get user information
 $user = get_user($conn, $_SESSION["user_id"]);
@@ -136,7 +136,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 ?>
 
-<?php render_header("search"); ?>
+<?php
+ render_header("search"); ?>
 
 <link rel="stylesheet" href="../assets/css/pages/app.css">
 <link rel="stylesheet" href="../assets/css/components/post.css">
@@ -147,20 +148,26 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <link rel="stylesheet" href="../assets/css/pages/search.css">
 
 <div class="d-flex">
-    <?php render_left_sidebar($user); ?>
+    <?php
+ render_left_sidebar($user); ?>
 
     <div class="main-content">
-        <?php render_page_header("search", "find posts and users", $_GET["origin"] ?? "feed.php", []); ?>
+        <?php
+ render_page_header("search", "find posts and users", $_GET["origin"] ?? "feed.php", []); ?>
         
         <!-- search form -->
         <div class="m-3 p-3 card rounded-3">
             <form method="POST" class="search-form">
                 <!-- Add hidden inputs to maintain state for followed_users array when using GET pagination -->
-                <?php if ($_SERVER["REQUEST_METHOD"] === "GET" && !empty($default_values["followed_users"])): ?>
-                    <?php foreach ($default_values["followed_users"] as $followed_id): ?>
+                <?php
+ if ($_SERVER["REQUEST_METHOD"] === "GET" && !empty($default_values["followed_users"])): ?>
+                    <?php
+ foreach ($default_values["followed_users"] as $followed_id): ?>
                         <input type="hidden" name="followed_users[]" value="<?= htmlspecialchars($followed_id) ?>">
-                    <?php endforeach; ?>
-                <?php endif; ?>
+                    <?php
+ endforeach; ?>
+                <?php
+ endif; ?>
                 <div class="row g-3">
                     <!-- keyword -->
                     <div class="col-6">
@@ -254,19 +261,26 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <div class="col-12">
                         <label for="followed_users" class="fw-bold">users i follow</label>
                         <select class="form-control rounded-3" id="followed_users" name="followed_users[]" multiple>
-                            <?php if (!empty($followed_users)): ?>
-                                <?php foreach ($followed_users as $follow_user): ?>
+                            <?php
+ if (!empty($followed_users)): ?>
+                                <?php
+ foreach ($followed_users as $follow_user): ?>
                                     <option value="<?= $follow_user["id"] ?>" 
                                             <?= in_array($follow_user["id"], $default_values["followed_users"]) ? "selected" : "" ?>>
                                         @<?= htmlspecialchars($follow_user["username"]) ?> 
-                                        <?php if ($follow_user["display_name"]): ?>
+                                        <?php
+ if ($follow_user["display_name"]): ?>
                                             (<?= htmlspecialchars($follow_user["display_name"]) ?>)
-                                        <?php endif; ?>
+                                        <?php
+ endif; ?>
                                     </option>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <option disabled>you"re not following anyone yet</option>
-                            <?php endif; ?>
+                                <?php
+ endforeach; ?>
+                            <?php
+ else: ?>
+                                <option disabled>you're not following anyone yet</option>
+                            <?php
+ endif; ?>
                         </select>
                         <div class="form-text">hold ctrl/cmd to select multiple users</div>
                     </div>
@@ -284,33 +298,44 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         
         <!-- search results -->
         <div class="mx-3 mb-3">
-            <?php if (!empty($error)): ?>
+            <?php
+ if (!empty($error)): ?>
                 <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
-            <?php endif; ?>
+            <?php
+ endif; ?>
             
-            <?php if (!empty($message)): ?>
+            <?php
+ if (!empty($message)): ?>
                 <div class="alert alert-success"><?= htmlspecialchars($message) ?></div>
-            <?php endif; ?>
+            <?php
+ endif; ?>
             
-            <?php if (!empty($search_results)): ?>
+            <?php
+ if (!empty($search_results)): ?>
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="m-0">
                         found <?= number_format($total_results) ?> results 
-                        <?php if ($total_results > count($search_results)): ?>
+                        <?php
+ if ($total_results > count($search_results)): ?>
                             (showing page <?= $current_page ?> of <?= ceil($total_results / $posts_per_page) ?>)
-                        <?php endif; ?>
+                        <?php
+ endif; ?>
                     </h5>
                 </div>
                 
                 <div class="posts">
                     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION["csrf_token"]) ?>">
-                    <?php foreach ($search_results as $post): ?>
-                        <?php render_post($post, $conn); ?> 
-                    <?php endforeach; ?>
+                    <?php
+ foreach ($search_results as $post): ?>
+                        <?php
+ render_post($post, $conn); ?> 
+                    <?php
+ endforeach; ?>
                 </div>
                 
                 <!-- Add pagination after search results -->
-                <?php 
+                <?php
+ 
                     // Build the base URL for pagination, maintaining all search parameters
                     if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         // For POST requests, create a GET URL with all parameters
@@ -353,20 +378,27 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     // Use the current posts_per_page for pagination
                     render_pagination($total_results, $posts_per_page, $current_page, $base_url);
                 ?>
-            <?php elseif ($_SERVER["REQUEST_METHOD"] === "POST" || isset($_GET["keyword"])): ?>
-                <?php render_empty_state("search", "no results found", "try different search terms or filters"); ?>
-            <?php else: ?>
-                <?php render_empty_state("search", "start searching", "use the form above to find posts"); ?>
-            <?php endif; ?>
+            <?php
+ elseif ($_SERVER["REQUEST_METHOD"] === "POST" || isset($_GET["keyword"])): ?>
+                <?php
+ render_empty_state("search", "no results found", "try different search terms or filters"); ?>
+            <?php
+ else: ?>
+                <?php
+ render_empty_state("search", "start searching", "use the form above to find posts"); ?>
+            <?php
+ endif; ?>
         </div>
     </div>
 
     <!-- right sidebar -->
-    <?php render_right_sidebar(); ?> 
+    <?php
+ render_right_sidebar($conn); ?> 
 </div>
 
 <!-- include interaction.js for like functionality -->
 <script src="../assets/js/interaction.js"></script>
 <script src="../assets/js/pages/search.js"></script>
 
-<?php render_footer(); ?>
+<?php
+ render_footer(); ?>

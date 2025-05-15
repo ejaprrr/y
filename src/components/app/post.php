@@ -1,5 +1,4 @@
 <?php
-
 require_once "../../src/functions/like.php";
 require_once "../../src/functions/user.php";
 require_once "../../src/functions/helpers.php";
@@ -15,7 +14,8 @@ function render_post($post, $conn) {
         <!-- profile information + clickable link -->
         <!-- clickable profile picture -->
         <a href="profile.php?username=<?= htmlspecialchars($post["username"]) ?>&origin=<?= get_clean_url() ?>" class="text-decoration-none">
-            <?php render_profile_picture($post_user); ?>
+            <?php
+ render_profile_picture($post_user); ?>
         </a>
         <div>
             <!-- clickable display name -->
@@ -40,11 +40,13 @@ function render_post($post, $conn) {
             <i class="bi <?= has_liked($conn, $_SESSION["user_id"], $post["id"]) ? "bi-heart-fill liked" : "bi-heart" ?>"></i>
             <span class="like-count"><?= get_like_count($conn, $post["id"]) ?></span>
         </button>
-        <?php if ($post_user["id"] == $_SESSION["user_id"]): ?>
+        <?php
+ if ($post_user["id"] == $_SESSION["user_id"]): ?>
             <button class="action-btn delete-btn hover-highlight d-flex align-items-center ms-3" data-post-id="<?= $post["id"] ?>">
                 <i class="bi bi-trash"></i>
             </button>
-        <?php endif; ?>
+        <?php
+ endif; ?>
     </div>
 </div>
 </div>

@@ -1,5 +1,4 @@
 <?php
-
 require_once "../../src/functions/connection.php";
 require_once "../../src/functions/auth.php";
 require_once "../../src/functions/helpers.php";
@@ -21,7 +20,7 @@ if (!check_login()) {
 }
 
 // Set CSRF token
-set_csrf_token();
+regenerate_csrf_token();
 
 // Get user information
 $user = get_user($conn, $_SESSION["user_id"]);
@@ -51,7 +50,8 @@ $post_count = get_hashtag_post_count($conn, $tag);
 
 ?>
 
-<?php render_header("#" . $tag); ?>
+<?php
+ render_header("#" . $tag); ?>
 
 <link rel="stylesheet" href="../assets/css/pages/app.css">
 <link rel="stylesheet" href="../assets/css/components/post.css">
@@ -64,10 +64,12 @@ $post_count = get_hashtag_post_count($conn, $tag);
     <!-- CSRF token -->
     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION["csrf_token"]) ?>">
                     
-    <?php render_left_sidebar($user); ?>
+    <?php
+ render_left_sidebar($user); ?>
 
     <div class="main-content">
-        <?php 
+        <?php
+ 
             // Define tabs
             $hashtag_tabs = [
                 [
@@ -93,34 +95,46 @@ $post_count = get_hashtag_post_count($conn, $tag);
         
         <div class="posts mx-3 my-3">
             <!-- render posts / empty state -->
-            <?php if (!empty($posts)): ?>
-                <?php foreach ($posts as $post): ?>
-                    <?php render_post($post, $conn); ?> 
-                <?php endforeach; ?>
-            <?php else: ?>
-                <?php 
+            <?php
+ if (!empty($posts)): ?>
+                <?php
+ foreach ($posts as $post): ?>
+                    <?php
+ render_post($post, $conn); ?> 
+                <?php
+ endforeach; ?>
+            <?php
+ else: ?>
+                <?php
+ 
                     render_empty_state(
                         "hash",
                         "no posts with #" . htmlspecialchars($tag) . " yet",
                         "be the first to use this hashtag!"
                     );
                 ?>
-            <?php endif; ?>
+            <?php
+ endif; ?>
 
             <!-- Add pagination after the posts -->
-            <?php if (!empty($posts)): ?>
-                <?php 
+            <?php
+ if (!empty($posts)): ?>
+                <?php
+ 
                     $base_url = "hashtag.php?tag=" . urlencode($tag) . "&tab=" . $active_tab;
                     render_pagination($post_count, $posts_per_page, $current_page, $base_url);
                 ?>
-            <?php endif; ?>
+            <?php
+ endif; ?>
         </div>
     </div>
 
     <!-- right sidebar -->
-    <?php render_right_sidebar(); ?> 
+    <?php
+ render_right_sidebar($conn); ?> 
 </div>
 
 <script src="../assets/js/interaction.js"></script>
 
-<?php render_footer(); ?>
+<?php
+ render_footer(); ?>

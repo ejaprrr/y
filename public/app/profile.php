@@ -22,7 +22,7 @@ if (!check_login()) {
 }
 
 // set CSRF token
-set_csrf_token();
+regenerate_csrf_token();
 
 // get user information
 $current_user = get_user($conn, $_SESSION["user_id"]);
@@ -63,7 +63,8 @@ $active_tab = isset($_GET["tab"]) ? sanitize_input($_GET["tab"]) : "posts";
 
 ?>
 
-<?php render_header($profile_user["display_name"] ?? $profile_user["username"]); ?>
+<?php
+ render_header($profile_user["display_name"] ?? $profile_user["username"]); ?>
 
 <link rel="stylesheet" href="../assets/css/pages/app.css">
 <link rel="stylesheet" href="../assets/css/components/post.css">
@@ -73,10 +74,12 @@ $active_tab = isset($_GET["tab"]) ? sanitize_input($_GET["tab"]) : "posts";
 <link rel="stylesheet" href="../assets/css/components/page-header.css">
 
 <div class="d-flex">
-    <?php render_left_sidebar($current_user); ?>
+    <?php
+ render_left_sidebar($current_user); ?>
 
     <div class="main-content">
-        <?php 
+        <?php
+ 
         // create tabs
         $profile_tabs = [
             [
@@ -105,40 +108,49 @@ $active_tab = isset($_GET["tab"]) ? sanitize_input($_GET["tab"]) : "posts";
             <!-- profile header and posts -->
             <div class="profile-header">
                 <!-- cover image -->
-                <?php if ($profile_user["cover_image"]): ?>
+                <?php
+ if ($profile_user["cover_image"]): ?>
                     <div class="cover-image">
                         <img src="<?= htmlspecialchars($profile_user["cover_image"]) ?>" alt="cover image" class="w-100 h-100 object-fit-cover">
                     </div>
-                <?php else: ?>
+                <?php
+ else: ?>
                     <div class="cover-image default-cover"></div>
-                <?php endif; ?>
+                <?php
+ endif; ?>
                 
                 <!-- profile info -->
                 <div class="px-3 mb-3 pt-5 position-relative">
                     <div class="d-flex">
                         <!-- profile picture -->
                         <div class="position-absolute profile-picture-container">
-                            <?php if ($profile_user["profile_picture"]): ?>
+                            <?php
+ if ($profile_user["profile_picture"]): ?>
                                 <img src="<?= htmlspecialchars($profile_user["profile_picture"]) ?>" alt="profile picture" class="avatar">
-                            <?php else: ?>
+                            <?php
+ else: ?>
                                 <div class="avatar default-avatar">
                                     <i class="bi bi-person-fill"></i>
                                 </div>
-                            <?php endif; ?>
+                            <?php
+ endif; ?>
                         </div>
                         
                         <!-- profile header actions -->
                         <div class="position-absolute translate-middle-y profile-header-actions end-0">
-                            <?php if ($is_own_profile): ?>
+                            <?php
+ if ($is_own_profile): ?>
                                 <a href="edit-profile.php?origin=<?= urlencode(get_clean_url()) ?>" class="btn btn-primary rounded-3 px-4 fw-semibold me-3">edit profile</a>
-                            <?php else: ?>
+                            <?php
+ else: ?>
                                 <button 
                                     class="btn btn-primary rounded-3 fw-semibold follow-btn me-3" 
                                     data-following="<?= $is_following ? "1" : "0" ?>" 
                                     data-user-id="<?= $profile_user["id"] ?>">
                                     <?= $is_following ? "unfollow" : "follow" ?>
                                 </button>
-                            <?php endif; ?>
+                            <?php
+ endif; ?>
                         </div>
                     </div>
                     
@@ -149,11 +161,13 @@ $active_tab = isset($_GET["tab"]) ? sanitize_input($_GET["tab"]) : "posts";
                     </div>
                     
                     <!-- profile bio -->
-                    <?php if (!empty($profile_user["bio"])): ?>
+                    <?php
+ if (!empty($profile_user["bio"])): ?>
                         <div class="mb-3">
                             <p><?= nl2br(htmlspecialchars($profile_user["bio"])) ?></p>
                         </div>
-                    <?php endif; ?>
+                    <?php
+ endif; ?>
                     
                     <!-- profile stats -->
                     <div class="d-flex gap-4 mb-3 small">
@@ -178,17 +192,25 @@ $active_tab = isset($_GET["tab"]) ? sanitize_input($_GET["tab"]) : "posts";
                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION["csrf_token"]) ?>">
 
                 <!-- render posts / empty state -->
-                <?php if ($active_tab === "posts"): ?>
-                    <?php if (!empty($posts)): ?>
-                        <?php foreach ($posts as $post): ?>
-                            <?php render_post($post, $conn); ?> 
-                        <?php endforeach; ?>
-                        <?php 
+                <?php
+ if ($active_tab === "posts"): ?>
+                    <?php
+ if (!empty($posts)): ?>
+                        <?php
+ foreach ($posts as $post): ?>
+                            <?php
+ render_post($post, $conn); ?> 
+                        <?php
+ endforeach; ?>
+                        <?php
+ 
                             $base_url = "profile.php?username=" . urlencode($profile_user["username"]) . "&tab=posts";
                             render_pagination($total_user_posts, $posts_per_page, $current_page, $base_url);
                         ?>
-                    <?php else: ?>
-                        <?php 
+                    <?php
+ else: ?>
+                        <?php
+ 
                         if ($is_own_profile) {
                             render_empty_state(
                                 "file-earmark-text", 
@@ -203,18 +225,27 @@ $active_tab = isset($_GET["tab"]) ? sanitize_input($_GET["tab"]) : "posts";
                             );
                         }
                         ?>
-                    <?php endif; ?>
-                <?php elseif ($active_tab === "likes"): ?>
-                    <?php if (!empty($liked_posts)): ?>
-                        <?php foreach ($liked_posts as $post): ?>
-                            <?php render_post($post, $conn); ?> 
-                        <?php endforeach; ?>
-                        <?php 
+                    <?php
+ endif; ?>
+                <?php
+ elseif ($active_tab === "likes"): ?>
+                    <?php
+ if (!empty($liked_posts)): ?>
+                        <?php
+ foreach ($liked_posts as $post): ?>
+                            <?php
+ render_post($post, $conn); ?> 
+                        <?php
+ endforeach; ?>
+                        <?php
+ 
                             $base_url = "profile.php?username=" . urlencode($profile_user["username"]) . "&tab=likes";
                             render_pagination($total_liked_posts, $posts_per_page, $current_page, $base_url);
                         ?>
-                    <?php else: ?>
-                        <?php 
+                    <?php
+ else: ?>
+                        <?php
+ 
                         if ($is_own_profile) {
                             render_empty_state(
                                 "heart", 
@@ -229,16 +260,20 @@ $active_tab = isset($_GET["tab"]) ? sanitize_input($_GET["tab"]) : "posts";
                             );
                         }
                         ?>
-                    <?php endif; ?>
-                <?php endif; ?>
+                    <?php
+ endif; ?>
+                <?php
+ endif; ?>
             </div>
         </div>
     </div>
 
     <!-- right sidebar -->
-    <?php render_right_sidebar(); ?> 
+    <?php
+ render_right_sidebar($conn); ?> 
 </div>
 
 <script src="../assets/js/interaction.js"></script>
 
-<?php render_footer(); ?>
+<?php
+ render_footer(); ?>

@@ -2,7 +2,8 @@
 require_once "../../src/components/layout.php";
 ?>
 
-<?php render_header("welcome"); ?>
+<?php
+ render_header("welcome"); ?>
 
 <link rel="stylesheet" href="../assets/css/pages/about.css">
 
@@ -49,4 +50,5 @@ require_once "../../src/components/layout.php";
     </div>
 </div>
 
-<?php render_footer(); ?>
+<?php
+ render_footer(); ?>

@@ -71,4 +71,5 @@ render_header("about us");
     </div>
 </div>
 
-<?php render_footer(); ?>
+<?php
+ render_footer(); ?>

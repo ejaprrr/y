@@ -9,133 +9,119 @@ require_once "../../src/functions/post.php";
 set_endpoint_header();
 
 if (!check_login()) {
-    http_response_code(403);
-    echo json_encode(["error" => "unauthorized"]);
+    respond(["error" => "unauthorized"], 403);
+}
+
+function respond($data, $code = 200) {
+    regenerate_csrf_token(false);
+    http_response_code($code);
+    $data['new_csrf_token'] = $_SESSION['csrf_token'];
+    $data['success'] = true;
+    echo json_encode($data);
     exit();
 }
 
-if (!check_csrf_token()) {
-    http_response_code(403);
-    echo json_encode(["error" => "invalid csrf token"]);
-    exit();
-}
-
-$user_id = $_SESSION["user_id"];
-$action = $_POST["action"] ?? "";
-$target_id = (int)($_POST["target_id"] ?? 0);
-
-if ($action === "like" || $action === "unlike") {
-    $post_id = $target_id;
-
-    if (!post_exists($conn, $post_id)) {
-        http_response_code(400);
-        echo json_encode(["error" => "invalid post id"]);
-        exit();
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!check_ajax_csrf_token()) {
+        respond(["error" => "invalid csrf token"], 403);
     }
 
-    if ($action === "like") {
-        $success = like_post($conn, $user_id, $post_id);
-        if (!$success) {
-            http_response_code(500);
-            echo json_encode(["error" => "failed to like post"]);
-            exit();
+    $user_id = $_SESSION["user_id"];
+    $action = $_POST["action"] ?? "";
+    $target_id = (int)($_POST["target_id"] ?? 0);
+
+    if ($action === "like" || $action === "unlike") {
+        $post_id = $target_id;
+
+        if (!post_exists($conn, $post_id)) {
+            respond(["error" => "invalid post id"], 400);
         }
-    } elseif ($action === "unlike") {
-        $success = unlike_post($conn, $user_id, $post_id);
-        if (!$success) {
-            http_response_code(500);
-            echo json_encode(["error" => "failed to unlike post"]);
-            exit();
+
+        if ($action === "like") {
+            $success = like_post($conn, $user_id, $post_id);
+            if (!$success) {
+                respond(["error" => "failed to like post"], 500);
+            }
+        } elseif ($action === "unlike") {
+            $success = unlike_post($conn, $user_id, $post_id);
+            if (!$success) {
+                respond(["error" => "failed to unlike post"], 500);
+            }
         }
+
+        respond([
+            "liked" => has_liked($conn, $user_id, $post_id),
+            "like_count" => get_like_count($conn, $post_id)
+        ]);
     }
 
-    echo json_encode([
-        "liked" => has_liked($conn, $user_id, $post_id),
-        "like_count" => get_like_count($conn, $post_id)
-    ]);
-    exit();
-}
+    if ($action === "follow" || $action === "unfollow") {
+        $followed_id = $target_id;
 
-if ($action === "follow" || $action === "unfollow") {
-    $followed_id = $target_id;
+        if ($user_id === $followed_id) {
+            respond(["error" => "cannot follow yourself"], 400);
+        }
 
-    if ($user_id === $followed_id) {
-        http_response_code(400);
-        echo json_encode(["error" => "cannot follow yourself"]);
-        exit();
+        if ($action === "follow") {
+            $stmt = $conn->prepare("INSERT IGNORE INTO follows (follower_id, followed_id) VALUES (?, ?)");
+            $stmt->bind_param("ii", $user_id, $followed_id);
+            $success = $stmt->execute();
+            $stmt->close();
+
+            if (!$success) {
+                respond(["error" => "failed to follow user"], 500);
+            }
+        } elseif ($action === "unfollow") {
+            $stmt = $conn->prepare("DELETE FROM follows WHERE follower_id = ? AND followed_id = ?");
+            $stmt->bind_param("ii", $user_id, $followed_id);
+            $success = $stmt->execute();
+            $stmt->close();
+
+            if (!$success) {
+                respond(["error" => "failed to unfollow user"], 500);
+            }
+        }
+
+        respond([
+            "following" => is_following($conn, $user_id, $followed_id),
+            "follower_count" => get_follower_count($conn, $followed_id)
+        ]);
     }
 
-    if ($action === "follow") {
-        $stmt = $conn->prepare("INSERT IGNORE INTO follows (follower_id, followed_id) VALUES (?, ?)");
-        $stmt->bind_param("ii", $user_id, $followed_id);
+    if ($action === "delete") {
+        $post_id = $target_id;
+
+        if (!post_exists($conn, $post_id)) {
+            respond(["error" => "invalid post id"], 400);
+        }
+
+        // Check if the user owns the post
+        $stmt = $conn->prepare("SELECT user_id FROM posts WHERE id = ?");
+        $stmt->bind_param("i", $post_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $post = $result->fetch_assoc();
+        $stmt->close();
+
+        if ($post["user_id"] !== $user_id) {
+            respond(["error" => "unauthorized"], 403);
+        }
+
+        // Delete the post
+        $stmt = $conn->prepare("DELETE FROM posts WHERE id = ?");
+        $stmt->bind_param("i", $post_id);
         $success = $stmt->execute();
         $stmt->close();
 
         if (!$success) {
-            http_response_code(500);
-            echo json_encode(["error" => "failed to follow user"]);
-            exit();
+            respond(["error" => "failed to delete post"], 500);
         }
-    } elseif ($action === "unfollow") {
-        $stmt = $conn->prepare("DELETE FROM follows WHERE follower_id = ? AND followed_id = ?");
-        $stmt->bind_param("ii", $user_id, $followed_id);
-        $success = $stmt->execute();
-        $stmt->close();
 
-        if (!$success) {
-            http_response_code(500);
-            echo json_encode(["error" => "failed to unfollow user"]);
-            exit();
-        }
+        respond(["success" => true]);
     }
 
-    echo json_encode([
-        "following" => is_following($conn, $user_id, $followed_id),
-        "follower_count" => get_follower_count($conn, $followed_id)
-    ]);
-    exit();
+    respond(['success' => true]);
 }
 
-if ($action === "delete") {
-    $post_id = $target_id;
-
-    if (!post_exists($conn, $post_id)) {
-        http_response_code(400);
-        echo json_encode(["error" => "invalid post id"]);
-        exit();
-    }
-
-    // Check if the user owns the post
-    $stmt = $conn->prepare("SELECT user_id FROM posts WHERE id = ?");
-    $stmt->bind_param("i", $post_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $post = $result->fetch_assoc();
-    $stmt->close();
-
-    if ($post["user_id"] !== $user_id) {
-        http_response_code(403);
-        echo json_encode(["error" => "unauthorized"]);
-        exit();
-    }
-
-    // Delete the post
-    $stmt = $conn->prepare("DELETE FROM posts WHERE id = ?");
-    $stmt->bind_param("i", $post_id);
-    $success = $stmt->execute();
-    $stmt->close();
-
-    if (!$success) {
-        http_response_code(500);
-        echo json_encode(["error" => "failed to delete post"]);
-        exit();
-    }
-
-    echo json_encode(["success" => true]);
-    exit();
-}
-
-http_response_code(400);
-echo json_encode(["error" => "invalid action"]);
-exit();
+respond(["error" => "invalid action"], 400);
 ?>

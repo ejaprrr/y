@@ -6,6 +6,10 @@ document.addEventListener("DOMContentLoaded", function () {
   const bioCounter = document.getElementById("bio-counter");
   const saveButton = profileForm.querySelector("button[type='submit']");
 
+  // File inputs
+  const profilePictureInput = document.getElementById("profile_picture");
+  const coverImageInput = document.getElementById("cover_image");
+
   // Max allowed characters
   const MAX_DISPLAY_NAME_LENGTH = 48;
   const MAX_BIO_LENGTH = 128;
@@ -17,63 +21,65 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let isValid = true;
 
-    // Validate display name
-    if (displayNameLength > MAX_DISPLAY_NAME_LENGTH) {
+    if (
+      displayNameLength > MAX_DISPLAY_NAME_LENGTH ||
+      bioLength > MAX_BIO_LENGTH
+    ) {
       isValid = false;
     }
 
-    // Validate bio
-    if (bioLength > MAX_BIO_LENGTH) {
-      isValid = false;
-    }
-
-    // Update button state
     saveButton.disabled = !isValid;
   }
 
-  // Profile Picture Preview (existing code)
-  const profilePictureInput = document.getElementById("profile_picture");
-  const profilePicPreview = document.getElementById("profile-pic-preview");
-
+  // Profile Picture Preview
   profilePictureInput.addEventListener("change", function () {
     if (this.files && this.files[0]) {
       const reader = new FileReader();
 
       reader.onload = function (e) {
-        // Check if preview is an img element or the default div
-        if (profilePicPreview.tagName === "IMG") {
-          // Update existing image
+        console.log("Profile Picture Base64:", e.target.result); // Debugging
+        const profilePicPreview = document.getElementById(
+          "profile-pic-preview"
+        );
+
+        if (profilePicPreview.tagName.toLowerCase() === "img") {
+          // Update the image source
           profilePicPreview.src = e.target.result;
         } else {
-          // Replace div with new image
+          // Replace the default icon with an image
+          const parentContainer = profilePicPreview.parentNode;
           const newImg = document.createElement("img");
           newImg.src = e.target.result;
           newImg.id = "profile-pic-preview";
-          newImg.alt = "Profile";
+          newImg.alt = "profile";
           newImg.className = "profile-picture-edit-img";
 
-          profilePicPreview.parentNode.replaceChild(newImg, profilePicPreview);
+          parentContainer.replaceChild(newImg, profilePicPreview);
         }
       };
 
+      reader.onerror = function () {
+        console.error("Error reading profile picture file.");
+      };
+
       reader.readAsDataURL(this.files[0]);
+    } else {
+      console.warn("No file selected for profile picture.");
     }
   });
 
   // Cover Image Preview
-  const coverImageInput = document.getElementById("cover_image");
-  const coverPreview = document.getElementById("cover-preview");
-
   coverImageInput.addEventListener("change", function () {
     if (this.files && this.files[0]) {
       const reader = new FileReader();
 
       reader.onload = function (e) {
-        // Check if there's already an img element
+        console.log("Cover Image Base64:", e.target.result); // Debugging
+        const coverPreview = document.getElementById("cover-preview");
         let coverImg = coverPreview.querySelector("img");
 
         if (coverImg) {
-          // Update existing image
+          // Update the image source
           coverImg.src = e.target.result;
         } else {
           // Remove placeholder if it exists
@@ -82,66 +88,43 @@ document.addEventListener("DOMContentLoaded", function () {
             placeholder.remove();
           }
 
-          // Create new image
+          // Create and add the new image
           coverImg = document.createElement("img");
           coverImg.src = e.target.result;
-          coverImg.alt = "Cover";
+          coverImg.alt = "cover";
           coverImg.className = "cover-img";
 
-          // Add the new image to the preview
           coverPreview.appendChild(coverImg);
         }
       };
 
+      reader.onerror = function () {
+        console.error("Error reading cover image file.");
+      };
+
       reader.readAsDataURL(this.files[0]);
+    } else {
+      console.warn("No file selected for cover image.");
     }
   });
 
-  // Enhanced Bio Character Counter with validation
+  // Bio character counter with validation
   bioTextarea.addEventListener("input", function () {
     const count = this.value.length;
     bioCounter.textContent = `${count}/128`;
 
-    // Remove empty newlines from bio
-    if (this.value.includes("\n\n")) {
-      this.value = this.value.replace(/\n\n+/g, "\n");
-    }
-
     // Color coding based on character count
-    if (count > 128 - 15) {
+    if (count > 128 - 15 && count <= 128) {
       bioCounter.classList.remove("text-danger");
       bioCounter.classList.add("text-warning");
+    } else if (count > 128) {
+      bioCounter.classList.remove("text-warning");
+      bioCounter.classList.add("text-danger");
     } else {
       bioCounter.classList.remove("text-warning", "text-danger");
     }
 
-    if (count > 128) {
-      bioCounter.classList.remove("text-warning");
-      bioCounter.classList.add("text-danger");
-    }
-
-    // Run form validation
     validateForm();
-  });
-
-  // Make the entire cover image area clickable
-  const coverContainer = document.querySelector(".cover-container");
-  coverContainer.addEventListener("click", function (e) {
-    // Don't trigger if clicking on the label itself
-    if (!e.target.closest("label")) {
-      document.getElementById("cover_image").click();
-    }
-  });
-
-  // Make the entire profile picture area clickable
-  const profilePicContainer = document.querySelector(
-    ".profile-picture-container-edit"
-  );
-  profilePicContainer.addEventListener("click", function (e) {
-    // Don't trigger if clicking on the label itself
-    if (!e.target.closest("label")) {
-      document.getElementById("profile_picture").click();
-    }
   });
 
   // Display name validation

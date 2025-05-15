@@ -15,11 +15,10 @@ if (!check_login()) {
     redirect("../auth/log-in.php");
 }
 
+regenerate_csrf_token();
+
 // upload base directory
 $upload_base = realpath(__DIR__ . "/../uploads");
-
-// set CSRF token
-set_csrf_token();
 
 // get user information
 $user = get_user($conn, $_SESSION["user_id"]);
@@ -43,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if (strlen($display_name) > 48) {
             $error = "display name is too long (maximum 48 characters)";
         } else {
-            // Validate bio
+            // validate bio
             $bio_validation = validate_bio($bio);
             if ($bio_validation !== true) {
                 $error = $bio_validation;
@@ -112,7 +111,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 ?>
 
-<?php render_header("edit profile"); ?>
+<?php
+ render_header("edit profile"); ?>
 
 <link rel="stylesheet" href="../assets/css/pages/app.css">
 <link rel="stylesheet" href="../assets/css/pages/edit-profile.css">
@@ -120,7 +120,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <link rel="stylesheet" href="../assets/css/components/right-sidebar.css">
 
 <div class="d-flex">
-    <?php render_left_sidebar($user); ?>
+    <?php
+ render_left_sidebar($user); ?>
 
     <div class="main-content">
         <?php
@@ -135,13 +136,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         ?>
 
         <!-- messages and errors -->
-        <?php if (!empty($message)): ?>
+        <?php
+ if (!empty($message)): ?>
             <div class="alert alert-success m-3"><?= $message ?></div>
-        <?php endif; ?>
+        <?php
+ endif; ?>
         
-        <?php if (!empty($error)): ?>
+        <?php
+ if (!empty($error)): ?>
             <div class="alert alert-danger m-3"><?= $error ?></div>
-        <?php endif; ?>
+        <?php
+ endif; ?>
 
         <!-- edit profile form -->
         <div class="edit-profile-container p-0">
@@ -150,36 +155,38 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <div class="profile-header-preview">
                     <!-- cover image -->
                     <div class="cover-container position-relative">
-                        <div class="cover-image-preview" id="cover-preview">
-                            <?php if ($user["cover_image"]): ?>
-                                <img src="<?= htmlspecialchars($user["cover_image"]) ?>" alt="Cover" class="cover-img">
-                            <?php else: ?>
+                        <label for="cover_image" class="cover-image-preview" id="cover-preview">
+                            <?php
+ if ($user["cover_image"]): ?>
+                                <img src="<?= htmlspecialchars($user["cover_image"]) ?>" alt="cover" class="cover-img">
+                            <?php
+ else: ?>
                                 <div class="cover-placeholder"></div>
-                            <?php endif; ?>
-                        </div>
-                        <div class="cover-overlay d-flex align-items-center justify-content-center">
-                            <label for="cover_image" class="btn btn-dark rounded-pill px-3">
-                                <i class="bi bi-camera-fill me-2"></i>change cover
-                            </label>
-                        </div>
+                            <?php
+ endif; ?>
+                            <div class="cover-overlay d-flex align-items-center justify-content-center">
+                                <i class="bi bi-camera-fill"></i>
+                            </div>
+                        </label>
                     </div>
                     
                     <!-- profile picture -->
                     <div class="profile-picture-edit">
-                        <div class="profile-picture-container-edit">
-                            <?php if ($user["profile_picture"]): ?>
-                                <img src="<?= htmlspecialchars($user["profile_picture"]) ?>" id="profile-pic-preview" alt="Profile" class="profile-picture-edit-img">
-                            <?php else: ?>
+                        <label for="profile_picture" class="profile-picture-container-edit">
+                            <?php
+ if ($user["profile_picture"]): ?>
+                                <img src="<?= htmlspecialchars($user["profile_picture"]) ?>" id="profile-pic-preview" alt="profile" class="profile-picture-edit-img">
+                            <?php
+ else: ?>
                                 <div id="profile-pic-preview" class="profile-picture-edit-default">
                                     <i class="bi bi-person-fill"></i>
                                 </div>
-                            <?php endif; ?>
+                            <?php
+ endif; ?>
                             <div class="profile-picture-overlay d-flex align-items-center justify-content-center">
-                                <label for="profile_picture" class="btn btn-dark btn-sm rounded-circle">
-                                    <i class="bi bi-camera-fill"></i>
-                                </label>
+                                <i class="bi bi-camera-fill"></i>
                             </div>
-                        </div>
+                        </label>
                     </div>
                 </div>
 
@@ -201,7 +208,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         <label for="bio" class="form-label fw-bold">bio</label>
                         <textarea class="form-control rounded-3" id="bio" name="bio" rows="3"><?= htmlspecialchars($user["bio"] ?? "") ?></textarea>
                         <div class="d-flex justify-content-between align-items-center mt-1">
-                            <span class="form-text">tell the world about usourself</span>
+                            <span class="form-text">tell the world about yourself</span>
                             <span id="bio-counter"><?= strlen($user["bio"] ?? "") ?>/128</span>
                         </div>
                     </div>
@@ -218,10 +225,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </div>
     </div>
 
-    <!-- Right Sidebar -->
-    <?php render_right_sidebar(); ?> 
+    <!-- right sidebar -->
+    <?php
+ render_right_sidebar($conn); ?> 
 </div>
 
 <script src="../assets/js/pages/edit-profile.js"></script>
 
-<?php render_footer(); ?>
+<?php
+ render_footer(); ?>

@@ -1,9 +1,9 @@
 <?php
 require_once "../../src/functions/hashtag.php";
 require_once "../../src/functions/user.php";
+require_once "../../src/components/app/empty-state.php";
 
-function render_right_sidebar() {
-    global $conn;
+function render_right_sidebar($conn) {
     // Get trending hashtags
     $trending_hashtags = get_trending_hashtags($conn, 3);
     
@@ -29,13 +29,16 @@ function render_right_sidebar() {
             <div class="p-3">
                 <h3 class="fs-5 mb-3">suggested users</h3>
                 <div>
-                    <?php if (!empty($suggested_users)): ?>
-                        <?php foreach ($suggested_users as $index => $suggested_user): ?>
+                    <?php
+ if (!empty($suggested_users)): ?>
+                        <?php
+ foreach ($suggested_users as $index => $suggested_user): ?>
                             <div class="hover-highlight p-3 rounded-3 d-flex <?= $index < count($suggested_users) - 1 ? "mb-1" : "" ?>">
                                 <div class="d-flex align-items-center w-100">
                                     <!-- user avatar -->
                                     <a href="profile.php?username=<?= htmlspecialchars($suggested_user["username"]) ?>&origin=<?= get_clean_url() ?>" class="text-decoration-none d-flex align-items-center">
-                                        <?php render_profile_picture($suggested_user); ?>
+                                        <?php
+ render_profile_picture($suggested_user); ?>
                                         <div class="ms-2">
                                             <!-- clickable display name -->
                                             <a href="profile.php?username=<?= htmlspecialchars($suggested_user["username"]) ?>&origin=<?= get_clean_url() ?>" class="text-decoration-none">
@@ -55,10 +58,14 @@ function render_right_sidebar() {
                                     </button>
                                 </div>
                             </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <?php render_empty_state("bi bi-at", "follow some users to see suggestions here."); ?>
-                    <?php endif; ?>
+                        <?php
+ endforeach; ?>
+                    <?php
+ else: ?>
+                        <?php
+ render_empty_state("bi bi-at", "follow some users to see suggestions here."); ?>
+                    <?php
+ endif; ?>
                 </div>
             </div>
         </div>
@@ -68,8 +75,10 @@ function render_right_sidebar() {
             <div class="p-3">
                 <h3 class="fs-5 mb-3">trending hashtags</h3>
                 <div>
-                    <?php if (!empty($trending_hashtags)): ?>
-                        <?php foreach ($trending_hashtags as $index => $trend): ?>
+                    <?php
+ if (!empty($trending_hashtags)): ?>
+                        <?php
+ foreach ($trending_hashtags as $index => $trend): ?>
                             <a href="../app/hashtag.php?tag=<?= htmlspecialchars($trend["hashtag"]) ?>&origin=<?= get_clean_url() ?>" class="hashtag-link text-decoration-none">
                                 <div class="hover-highlight p-3 rounded-3 <?= $index < count($trending_hashtags) - 1 ? "mb-1" : "" ?>">
                                     <div class="fw-bold">
@@ -78,10 +87,14 @@ function render_right_sidebar() {
                                     <small><?= number_format($trend["count"]) ?> posts</small>
                                 </div>
                             </a>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <?php render_empty_state("bi bi-hash", "no trending hashtags at the moment."); ?>
-                    <?php endif; ?>
+                        <?php
+ endforeach; ?>
+                    <?php
+ else: ?>
+                        <?php
+ render_empty_state("bi bi-hash", "no trending hashtags at the moment."); ?>
+                    <?php
+ endif; ?>
                 </div>
             </div>
         </div>

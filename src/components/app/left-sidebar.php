@@ -38,7 +38,8 @@ function render_left_sidebar($user) {
             <!-- Make profile picture and text clickable -->
             <a href="profile.php?origin=<?= get_clean_url() ?>" class="d-flex align-items-center text-decoration-none flex-grow-1">
                 <!-- profile picture -->
-                <?php render_profile_picture($user); ?>
+                <?php
+ render_profile_picture($user); ?>
                 <div>
                     <div class="fw-bold user-link"><?= htmlspecialchars($user["display_name"] ?? $user["username"]) ?></div>
                     <small class="user-handle">@<?= htmlspecialchars($user["username"]) ?></small>
