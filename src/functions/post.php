@@ -104,7 +104,7 @@ function get_following_posts($conn, $user_id, $page = 1, $per_page = 10) {
             LIMIT ? OFFSET ?";
     
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("iiiii", $user_id, $user_id, $per_page, $offset);
+    $stmt->bind_param("iiii", $user_id, $user_id, $per_page, $offset);
     $stmt->execute();
     $result = $stmt->get_result();
     
