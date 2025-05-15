@@ -32,11 +32,11 @@ function save_hashtags($conn, $post_id, $content) {
 function get_trending_hashtags($conn, $limit = 3) {
     $past_week = date("Y-m-d H:i:s", strtotime("-7 days"));
     
-    $sql = "SELECT hashtag, COUNT(*) as count 
+    $sql = "SELECT hashtag, COUNT(*) as count, MAX(created_at) as latest_date 
             FROM hashtags 
             WHERE created_at > ? 
             GROUP BY hashtag 
-            ORDER BY count DESC, created_at DESC 
+            ORDER BY count DESC, latest_date DESC 
             LIMIT ?";
     
     $stmt = $conn->prepare($sql);

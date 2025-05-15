@@ -64,7 +64,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         
                         // move the uploaded file
                         if (move_uploaded_file($_FILES["profile_picture"]["tmp_name"], $target_path)) {
-                            $profile_path = "/y/public/uploads/profile/" . $filename;
+                            // Delete old profile picture if exists
+                            if (!empty($user["profile_picture"])) {
+                                $old_filename = basename($user["profile_picture"]);
+                                $old_path = $upload_base . "/profile/" . $old_filename;
+                                if (file_exists($old_path)) {
+                                    unlink($old_path);
+                                }
+                            }
+
+                            $profile_path = BASE_URL . "/public/uploads/profile/" . $filename;
                             update_profile_picture($conn, $_SESSION["user_id"], $profile_path);
                         } else {
                             $error = "failed to upload profile picture";
@@ -88,7 +97,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         
                         // move the uploaded file
                         if (move_uploaded_file($_FILES["cover_image"]["tmp_name"], $target_path)) {
-                            $cover_path = "/y/public/uploads/cover/" . $filename;
+                            // Delete old cover image if exists
+                            if (!empty($user["cover_image"])) {
+                                $old_filename = basename($user["cover_image"]);
+                                $old_path = $upload_base . "/cover/" . $old_filename;
+                                if (file_exists($old_path)) {
+                                    unlink($old_path);
+                                }
+                            }
+                            
+                            $cover_path = BASE_URL . "/public/uploads/cover/" . $filename;
                             update_cover_image($conn, $_SESSION["user_id"], $cover_path);
                         } else {
                             $error = "failed to upload cover image";
