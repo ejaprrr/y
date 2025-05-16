@@ -73,7 +73,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 }
                             }
 
-                            $profile_path = BASE_URL . "/public/uploads/profile/" . $filename;
+                            $profile_path = "../uploads/profile/" . $filename;
                             update_profile_picture($conn, $_SESSION["user_id"], $profile_path);
                         } else {
                             $error = "failed to upload profile picture";
@@ -106,7 +106,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 }
                             }
                             
-                            $cover_path = BASE_URL . "/public/uploads/cover/" . $filename;
+                            $cover_path = "../uploads/cover/" . $filename;
                             update_cover_image($conn, $_SESSION["user_id"], $cover_path);
                         } else {
                             $error = "failed to upload cover image";
